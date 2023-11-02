@@ -65,7 +65,9 @@ const SignupPage = () => {
   const [response, setResponse] = useState('');
   const [error, setError] = useState(null);
 
-  const handleSignup = () => {
+  const handleSignup = (e) => {
+    e.preventDefault(); // Prevent the default form submission
+
     // Construct the request body
     const requestBody = {
       username,
