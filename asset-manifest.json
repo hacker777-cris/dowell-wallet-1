@@ -1,0 +1,16 @@
+{
+  "files": {
+    "main.css": "/hacker777-cris/Dowell-wallet.git/static/css/main.e6c13ad2.css",
+    "main.js": "/hacker777-cris/Dowell-wallet.git/static/js/main.9ed006c7.js",
+    "static/js/787.e5dc3531.chunk.js": "/hacker777-cris/Dowell-wallet.git/static/js/787.e5dc3531.chunk.js",
+    "static/media/Logo.png": "/hacker777-cris/Dowell-wallet.git/static/media/Logo.96663a280224091e4252.png",
+    "index.html": "/hacker777-cris/Dowell-wallet.git/index.html",
+    "main.e6c13ad2.css.map": "/hacker777-cris/Dowell-wallet.git/static/css/main.e6c13ad2.css.map",
+    "main.9ed006c7.js.map": "/hacker777-cris/Dowell-wallet.git/static/js/main.9ed006c7.js.map",
+    "787.e5dc3531.chunk.js.map": "/hacker777-cris/Dowell-wallet.git/static/js/787.e5dc3531.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.e6c13ad2.css",
+    "static/js/main.9ed006c7.js"
+  ]
+}
