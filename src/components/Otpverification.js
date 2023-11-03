@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { useUser } from '../UserContext'; // Import useUser from your context file
 
 const containerStyle = {
   maxWidth: '800px',
@@ -41,6 +42,21 @@ const buttonStyle = {
   cursor: 'pointer',
 };
 
+const linkStyle = {
+  textDecoration: 'none',
+  color: '#0070BA',
+  fontSize: '0.875rem',
+  marginLeft: '10px', // Added margin for spacing
+  display: 'flex',
+  alignItems: 'center',
+};
+
+const timerStyle = {
+  marginLeft: '10px',
+  fontSize: '0.875rem',
+  color: '#999',
+};
+
 const responseStyle = {
   color: 'green',
   marginBottom: '10px',
@@ -55,15 +71,41 @@ const OTPVerificationPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [otpKey, setOTPKey] = useState('');
-  const email = location.state.email || ''; // Retrieve email from location state with a default value
+  const { email, setEmail } = useUser(); // Use the email and setEmail from the context
   const [response, setResponse] = useState('');
   const [error, setError] = useState(null);
+  const [isResendDisabled, setIsResendDisabled] = useState(false);
+  const [remainingTime, setRemainingTime] = useState(60); // Initial remaining time in seconds
+
+  console.log('Email in state:', email); // Debugging line
+
+  useEffect(() => {
+    let timerInterval;
+
+    // If the "Resend OTP" link is disabled, start a timer to enable it after 1 minute
+    if (isResendDisabled) {
+      timerInterval = setInterval(() => {
+        if (remainingTime > 0) {
+          setRemainingTime(remainingTime - 1);
+        } else {
+          clearInterval(timerInterval);
+          setIsResendDisabled(false);
+        }
+      }, 1000);
+    }
+
+    return () => {
+      if (timerInterval) {
+        clearInterval(timerInterval);
+      }
+    };
+  }, [isResendDisabled, remainingTime]);
 
   const handleVerifyOTP = () => {
     // Construct the request body
     const requestBody = {
       otp_key: otpKey,
-      email, // Use the email received from the location state
+      email, // Use the email received from the context
     };
 
     // Make a POST request to verify the OTP
@@ -95,6 +137,40 @@ const OTPVerificationPage = () => {
       });
   };
 
+  const handleResendOTP = () => {
+    // Prevent multiple clicks while the link is disabled
+    if (isResendDisabled) {
+      return;
+    }
+
+    // Construct the request body
+    const requestBody = {
+      email, // Use the email received from the context
+    };
+
+    // Make a POST request to resend the OTP
+    fetch('https://100088.pythonanywhere.com/api/wallet/v1/resend-otp', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(requestBody),
+    })
+      .then((response) => {
+        if (response.ok) {
+          setResponse('OTP resent successfully');
+          setIsResendDisabled(true); // Disable the "Resend OTP" link
+          setRemainingTime(60); // Reset the timer
+        } else {
+          setError('Failed to resend OTP');
+        }
+      })
+      .catch((error) => {
+        console.error('Error during OTP resend:', error);
+        setError('An error occurred while resending OTP.');
+      });
+  };
+
   return (
     <div style={containerStyle}>
       <header style={headerStyle}>
@@ -117,6 +193,10 @@ const OTPVerificationPage = () => {
           <button type="button" onClick={handleVerifyOTP} style={buttonStyle}>
             Verify OTP
           </button>
+          <Link to="#" onClick={handleResendOTP} style={linkStyle} disabled={isResendDisabled}>
+            Resend OTP
+            {isResendDisabled && <span style={timerStyle}> ({remainingTime}s)</span>}
+          </Link>
         </form>
       </div>
     </div>

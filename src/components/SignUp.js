@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useUser } from '../UserContext'; // Import the useUser hook
 
 const containerStyle = {
   display: 'flex',
@@ -57,9 +58,10 @@ const linkStyle = {
 };
 
 const SignupPage = () => {
+  const { setEmail: setEmailInContext } = useUser(); // Rename the variable to avoid conflicts
   const navigate = useNavigate();
   const [username, setUsername] = useState('');
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState(''); // Rename the local 'setEmail' state variable
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [response, setResponse] = useState('');
@@ -91,10 +93,10 @@ const SignupPage = () => {
           setResponse('Signup successful. You can now verify your OTP.');
           setError(null); // Clear the error message
           setUsername('');
-          setEmail('');
+          setEmailInContext(email); // Set the email in the context
           setPassword('');
           setConfirmPassword('');
-          navigate('/otp-verification', { state: { email } }); // Redirect to the OTP verification page
+          navigate('/otp-verification');
         } else {
           const errorData = await response.json();
           const errorMessage = errorData.message;
