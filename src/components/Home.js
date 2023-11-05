@@ -88,6 +88,19 @@ const transferButtonStyle = {
   transition: 'background-color 0.3s',
 };
 
+const accountNumberContainerStyle = {
+  color: 'black',
+  display: 'flex',
+  justifyContent: 'flex-end',
+  alignItems: 'center',
+};
+
+const accountNumberStyle = {
+  color: '#0070BA',
+  fontSize: '18px',
+  marginRight: '20px',
+};
+
 const recentTransactionsStyle = {
   padding: '20px',
   background: 'white',
@@ -170,20 +183,25 @@ const HomePage = () => {
   return (
     <div style={containerStyle}>
       <header style={headerStyle}>
-        <img src={logoImage} alt="Dowell wallet" style={logoStyle} />
-        <div style={navBarStyle}>
-          <div>
-            <Link to="/profile" style={navItemStyle}>
-              Profile
-            </Link>
-          </div>
-          <div>
-            <span style={navItemStyle} onClick={handleLogout}>
-              Logout
-            </span>
-          </div>
-        </div>
-      </header>
+  <img src={logoImage} alt="Dowell wallet" style={logoStyle} />
+  <div style={navBarStyle}>
+    <div>
+      <Link to="/profile" style={navItemStyle}>
+        Profile
+      </Link>
+    </div>
+    <div>
+      <span style={navItemStyle} onClick={handleLogout}>
+        Logout
+      </span>
+    </div>
+  </div>
+</header>
+<div style={accountNumberContainerStyle}>
+      <span style={accountNumberStyle}>
+        Account: {walletData.wallet.account_no}
+      </span>
+    </div>
       <div style={walletBalanceContainerStyle}>
         <div style={walletBalanceStyle}>${walletData.wallet.balance}</div>
         <div style={buttonContainerStyle}>
