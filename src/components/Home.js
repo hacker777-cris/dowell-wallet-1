@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useUser } from '../UserContext';
+import Loader from './Loader'; // Import the Loader component
 import logoImage from '../images/Logo.png';
 
 // Define the isAccessTokenAvailable function
@@ -25,13 +26,13 @@ const headerStyle = {
 };
 
 const logoStyle = {
-    height: '40px', // Set the height to 20px
-    width: '40px', // Set the width to 20px
-  };
+  height: '40px',
+  width: '40px',
+};
 
 const navBarStyle = {
   display: 'flex',
-  justifyContent: 'space-between', // Align items to the right
+  justifyContent: 'space-between',
 };
 
 const navItemStyle = {
@@ -115,6 +116,8 @@ const HomePage = () => {
   const { setAccessToken } = useUser();
   const navigate = useNavigate();
 
+  const [isLoadingTopUp, setIsLoadingTopUp] = useState(false); // Add isLoadingTopUp state
+
   const [walletData, setWalletData] = useState({ wallet: { balance: '0.00' }, transactions: [] });
 
   useEffect(() => {
@@ -154,10 +157,20 @@ const HomePage = () => {
     navigate('/login');
   };
 
+  const handleTopUp = () => {
+    setIsLoadingTopUp(true); // Set the loading state to true
+
+    // Simulate some async operation before navigating to the deposit page
+    setTimeout(() => {
+      navigate('/deposit');
+      setIsLoadingTopUp(false); // Set the loading state back to false
+    }, 1000); // Adjust the duration as needed
+  };
+
   return (
     <div style={containerStyle}>
       <header style={headerStyle}>
-      <img src={logoImage} alt="Dowell wallet" style={logoStyle} />
+        <img src={logoImage} alt="Dowell wallet" style={logoStyle} />
         <div style={navBarStyle}>
           <div>
             <Link to="/profile" style={navItemStyle}>
@@ -174,9 +187,14 @@ const HomePage = () => {
       <div style={walletBalanceContainerStyle}>
         <div style={walletBalanceStyle}>${walletData.wallet.balance}</div>
         <div style={buttonContainerStyle}>
-          <Link to="/deposit" style={topUpButtonStyle}>
-            Top Up
-          </Link>
+          {/* Use the isLoadingTopUp state to conditionally render the button or loader */}
+          {isLoadingTopUp ? (
+            <Loader /> // Use the Loader component
+          ) : (
+            <button onClick={handleTopUp} style={topUpButtonStyle} disabled={isLoadingTopUp}>
+              Top Up
+            </button>
+          )}
           <Link to="/transfer" style={transferButtonStyle}>
             Transfer
           </Link>

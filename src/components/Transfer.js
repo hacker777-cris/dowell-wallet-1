@@ -57,7 +57,7 @@ const ErrorMessage = ({ error }) => {
 const TransferPage = () => {
   const { user } = useUser();
   const navigate = useNavigate();
-  const [recipientName, setRecipientName] = useState('');
+  const [accountNo, setAccountNo] = useState(''); // Updated variable name
   const [amount, setAmount] = useState('');
   const [error, setError] = useState(null);
 
@@ -71,7 +71,7 @@ const TransferPage = () => {
   
     // Construct the request body
     const requestBody = {
-      recipient_username: recipientName,
+      account_no: accountNo, // Updated variable name
       amount: parseInt(amount, 10), // Convert amount to an integer
     };
   
@@ -119,13 +119,13 @@ const TransferPage = () => {
       </header>
       <div style={formContainerStyle}>
         <form>
-          <label htmlFor="recipientName">Recipient's Name</label>
+        <label htmlFor="accountNo">Recipient's Account Number</label>
           <input
             type="text"
-            id="recipientName"
-            name="recipientName"
-            value={recipientName}
-            onChange={(e) => setRecipientName(e.target.value)}
+            id="accountNo"
+            name="accountNo"
+            value={accountNo}
+            onChange={(e) => setAccountNo(e.target.value)}
             style={inputStyle}
           />
           <label htmlFor="amount">Amount</label>
