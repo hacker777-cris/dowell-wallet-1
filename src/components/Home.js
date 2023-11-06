@@ -1,14 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useUser } from '../UserContext';
+import { TokenManager } from './Tokenmanager'; // Import the TokenManager
 import Loader from './Loader'; // Import the Loader component
 import logoImage from '../images/Logo.png';
-
-// Define the isAccessTokenAvailable function
-const isAccessTokenAvailable = () => {
-  const storedAccessToken = localStorage.getItem('accessToken');
-  return !!storedAccessToken;
-};
 
 const containerStyle = {
   maxWidth: '1200px',
@@ -129,85 +124,78 @@ const HomePage = () => {
   const { setAccessToken } = useUser();
   const navigate = useNavigate();
 
-  const [isLoadingTopUp, setIsLoadingTopUp] = useState(false); // Add isLoadingTopUp state
-
+  const [isLoadingTopUp, setIsLoadingTopUp] = useState(false);
   const [walletData, setWalletData] = useState({ wallet: { balance: '0.00' }, transactions: [] });
 
   useEffect(() => {
-    if (!isAccessTokenAvailable()) {
+    // Retrieve the access token from the TokenManager
+    const storedAccessToken = TokenManager.getToken();
+
+    if (!storedAccessToken) {
       navigate('/login');
       return;
     }
 
-    const storedAccessToken = localStorage.getItem('accessToken');
+    setAccessToken(storedAccessToken);
 
-    if (storedAccessToken) {
-      setAccessToken(storedAccessToken);
+    const apiUrl = 'https://100088.pythonanywhere.com/api/wallet/v1/wallet_detail';
 
-      const apiUrl = 'https://100088.pythonanywhere.com/api/wallet/v1/wallet_detail';
-
-      fetch(apiUrl, {
-        method: 'GET',
-        headers: {
-          Authorization: `Bearer ${storedAccessToken}`,
-        },
+    fetch(apiUrl, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${storedAccessToken}`,
+      },
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        setWalletData(data);
       })
-        .then((response) => response.json())
-        .then((data) => {
-          setWalletData(data);
-        })
-        .catch((error) => {
-          console.error('Error fetching data:', error);
-        });
-    }
+      .catch((error) => {
+        console.error('Error fetching data:', error);
+      });
   }, [navigate]);
 
-  // Function to handle logout
   const handleLogout = () => {
-    // Clear the access token from localStorage
     localStorage.removeItem('accessToken');
-    // Redirect to the login page
     navigate('/login');
   };
 
   const handleTopUp = () => {
-    setIsLoadingTopUp(true); // Set the loading state to true
+    setIsLoadingTopUp(true);
 
-    // Simulate some async operation before navigating to the deposit page
     setTimeout(() => {
       navigate('/deposit');
-      setIsLoadingTopUp(false); // Set the loading state back to false
-    }, 1000); // Adjust the duration as needed
+      setIsLoadingTopUp(false);
+    }, 1000);
   };
 
   return (
     <div style={containerStyle}>
       <header style={headerStyle}>
-  <img src={logoImage} alt="Dowell wallet" style={logoStyle} />
-  <div style={navBarStyle}>
-    <div>
-      <Link to="/profile" style={navItemStyle}>
-        Profile
-      </Link>
-    </div>
-    <div>
-      <span style={navItemStyle} onClick={handleLogout}>
-        Logout
-      </span>
-    </div>
-  </div>
-</header>
-<div style={accountNumberContainerStyle}>
-      <span style={accountNumberStyle}>
-        Account: {walletData.wallet.account_no}
-      </span>
-    </div>
+        <img src={logoImage} alt="Dowell wallet" style={logoStyle} />
+        <div style={navBarStyle}>
+          <div>
+            <Link to="/profile" style={navItemStyle}>
+              Profile
+            </Link>
+          </div>
+          <div>
+            <span style={navItemStyle} onClick={handleLogout}>
+              Logout
+            </span>
+          </div>
+        </div>
+      </header>
+      <div style={accountNumberContainerStyle}>
+        <span style={accountNumberStyle}>
+          Account: {walletData.wallet.account_no}
+        </span>
+      </div>
       <div style={walletBalanceContainerStyle}>
         <div style={walletBalanceStyle}>${walletData.wallet.balance}</div>
         <div style={buttonContainerStyle}>
-          {/* Use the isLoadingTopUp state to conditionally render the button or loader */}
           {isLoadingTopUp ? (
-            <Loader /> // Use the Loader component
+            <Loader />
           ) : (
             <button onClick={handleTopUp} style={topUpButtonStyle} disabled={isLoadingTopUp}>
               Top Up

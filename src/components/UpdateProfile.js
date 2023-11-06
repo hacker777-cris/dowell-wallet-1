@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { TokenManager } from './Tokenmanager';
 
 const containerStyle = {
   maxWidth: '800px',
@@ -96,10 +97,10 @@ const UpdateProfile = () => {
 
     // Send a POST request with the FormData
     try {
-      const storedAccessToken = localStorage.getItem('accessToken');
+      const storedAccessToken = TokenManager.getToken(); // Retrieve the access token using TokenManager
 
       if (!storedAccessToken) {
-        console.error('Access token not found in local storage');
+        navigate('/login');
         return;
       }
 
@@ -126,6 +127,7 @@ const UpdateProfile = () => {
       setError('An error occurred while updating the profile.');
     }
   };
+
 
   return (
     <div style={containerStyle}>

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { useUser } from '../UserContext';
+import { useNavigate } from 'react-router-dom';
+import { TokenManager } from './Tokenmanager'; 
 
 const containerStyle = {
   maxWidth: '800px',
@@ -48,6 +49,7 @@ const buttonStyle = {
 const DepositPage = () => {
   const [amount, setAmount] = useState('');
   const [message, setMessage] = useState('');
+  const navigate = useNavigate(); // Get the navigate function
 
   const handleDeposit = () => {
     // Check if the amount is valid (you can add more validation here)
@@ -55,12 +57,13 @@ const DepositPage = () => {
       setMessage('Please enter a valid amount.');
       return;
     }
-  
+
     const apiUrl = 'https://100088.pythonanywhere.com/api/wallet/v1/stripe-payment';
-    const storedAccessToken = localStorage.getItem('accessToken');
+    const storedAccessToken = TokenManager.getToken();
 
     if (!storedAccessToken) {
-      // Handle the case where the access token is not available in local storage
+      // Handle the case where the access token is not available
+      navigate('/login'); // Redirect to the login page
       return;
     }
 
@@ -68,24 +71,24 @@ const DepositPage = () => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${storedAccessToken}`, // Use the stored access token
+        Authorization: `Bearer ${storedAccessToken}`,
       },
       body: JSON.stringify({ amount: parseFloat(amount) }),
     })
-    .then((response) => response.json())
-    .then((data) => {
-      setMessage(data.message);
+      .then((response) => response.json())
+      .then((data) => {
+        setMessage(data.message);
 
-      if (data.success) {
-        // If the deposit is successful, redirect to the approval URL
-        window.location.href = data.approval_url;
-      }
-    })
-    .catch((error) => {
-      console.error('Error making a deposit:', error);
-      setMessage('An error occurred. Please try again.');
-    });
+        if (data.success) {
+          window.location.href = data.approval_url;
+        }
+      })
+      .catch((error) => {
+        console.error('Error making a deposit:', error);
+        setMessage('An error occurred. Please try again.');
+      });
   };
+
 
   return (
     <div style={containerStyle}>

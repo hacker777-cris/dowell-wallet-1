@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom'; // Import useNavigate for redirection
-import { useUser } from '../UserContext'; 
+import { useUser } from '../UserContext';
+import { TokenManager } from './Tokenmanager'; // Import the TokenManager
 
 const containerStyle = {
     display: 'flex',
@@ -83,8 +84,8 @@ const LoginPage = () => {
         .then((response) => response.json())
         .then((data) => {
           if (data.access_token) {
-            // Save access token to local storage
-            localStorage.setItem('accessToken', data.access_token);
+            // Set access token with a specific expiration time (e.g., 600 minutes)
+            TokenManager.setToken(data.access_token, 120);
 
             // Set access token in the context
             setAccessToken(data.access_token);

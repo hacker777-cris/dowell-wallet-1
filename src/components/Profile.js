@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useUser } from '../UserContext';
+import { TokenManager } from './Tokenmanager';
 
 const containerStyle = {
   maxWidth: '800px',
@@ -77,15 +78,13 @@ const ProfilePage = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const storedAccessToken = localStorage.getItem('accessToken');
+    const storedAccessToken = TokenManager.getToken(); // Retrieve the access token using TokenManager
 
     if (!storedAccessToken) {
-      // If no access token is found, navigate to the login page
       navigate('/login');
       return;
     }
 
-    // Fetch the user's profile data with the stored access token
     fetch('https://100088.pythonanywhere.com/api/wallet/v1/profile', {
       method: 'GET',
       headers: {
@@ -96,7 +95,7 @@ const ProfilePage = () => {
         if (response.ok) {
           return response.json();
         } else {
-            throw new Error(`Failed to retrieve profile data. Status: ${response.status}`);
+          throw new Error(`Failed to retrieve profile data. Status: ${response.status}`);
         }
       })
       .then((data) => {

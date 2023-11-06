@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useUser } from '../UserContext';
+import { TokenManager } from './Tokenmanager'; 
 
 const containerStyle = {
   maxWidth: '800px',
@@ -57,57 +58,51 @@ const ErrorMessage = ({ error }) => {
 const TransferPage = () => {
   const { user } = useUser();
   const navigate = useNavigate();
-  const [accountNo, setAccountNo] = useState(''); // Updated variable name
+  const [accountNo, setAccountNo] = useState('');
   const [amount, setAmount] = useState('');
   const [error, setError] = useState(null);
 
   const handleTransfer = () => {
-    // Check if there is an access token in localStorage
-    const storedAccessToken = localStorage.getItem('accessToken');
+    const storedAccessToken = TokenManager.getToken(); // Retrieve the access token using TokenManager
+
     if (!storedAccessToken) {
-      navigate('/login'); // Redirect to the login page using useNavigate
+      navigate('/login');
       return;
     }
-  
-    // Construct the request body
+
     const requestBody = {
-      account_no: accountNo, // Updated variable name
-      amount: parseInt(amount, 10), // Convert amount to an integer
+      account_no: accountNo,
+      amount: parseInt(amount, 10),
     };
-  
-    // Implement your transfer logic here
-    // For example, make a POST request to transfer funds
+
     fetch('https://100088.pythonanywhere.com/api/wallet/v1/transfer', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${storedAccessToken}`,
       },
-      body: JSON.stringify(requestBody), // Send the correct request body
+      body: JSON.stringify(requestBody),
     })
       .then(async (response) => {
         if (response.ok) {
-          // Transfer was successful, you can redirect or show a success message
-          navigate('/'); // Redirect to the confirmation page
+          navigate('/');
         } else {
-          const errorData = await response.json(); // Parse the JSON response
-          const errorMessage = errorData.message; // Extract the error message
-          setError(errorMessage); // Set the error message state to the user-friendly error message
+          const errorData = await response.json();
+          const errorMessage = errorData.message;
+          setError(errorMessage);
         }
       })
       .catch((error) => {
         console.error('Error transferring funds:', error);
-        setError('An error occurred while transferring funds.'); // Set a generic error message
+        setError('An error occurred while transferring funds.');
       });
   };
-  
-  
 
   useEffect(() => {
-    // Check if the access token is available in localStorage when the page loads
-    const storedAccessToken = localStorage.getItem('accessToken');
+    const storedAccessToken = TokenManager.getToken();
+
     if (!storedAccessToken) {
-      navigate('/login'); // Redirect to the login page using useNavigate
+      navigate('/login');
     }
   }, [navigate]);
 
@@ -119,7 +114,7 @@ const TransferPage = () => {
       </header>
       <div style={formContainerStyle}>
         <form>
-        <label htmlFor="accountNo">Recipient's Account Number</label>
+          <label htmlFor="accountNo">Recipient's Account Number</label>
           <input
             type="text"
             id="accountNo"
