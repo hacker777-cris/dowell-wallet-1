@@ -70,6 +70,20 @@ const SignupPage = () => {
   const handleSignup = (e) => {
     e.preventDefault(); // Prevent the default form submission
 
+    // Add the regular expressions for password validation
+    const passwordPattern = /^(?=.*[A-Z])(?=.*[!@#$%^&*])(.{8,})$/;
+
+    if (!password.match(passwordPattern)) {
+      setError('Password must contain at least 8 characters, one uppercase letter, and one symbol (!@#$%^&*)');
+      return;
+    }
+    
+    if (password !== confirmPassword) {
+      setError('Password and confirm password do not match');
+      return;
+    }
+    
+
     // Construct the request body
     const requestBody = {
       username,
