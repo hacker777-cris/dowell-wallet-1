@@ -79,7 +79,7 @@ const SignupPage = () => {
     }
     
     if (password !== confirmPassword) {
-      setError('Password and confirm password do not match');
+      setError('Passwords do not match');
       return;
     }
     
