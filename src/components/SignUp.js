@@ -58,19 +58,19 @@ const linkStyle = {
 };
 
 const SignupPage = () => {
-  const { setEmail: setEmailInContext } = useUser(); // Rename the variable to avoid conflicts
+  const { setEmail: setEmailInContext } = useUser();
   const navigate = useNavigate();
   const [username, setUsername] = useState('');
-  const [email, setEmail] = useState(''); // Rename the local 'setEmail' state variable
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false); // State to toggle password visibility
   const [response, setResponse] = useState('');
   const [error, setError] = useState(null);
 
   const handleSignup = (e) => {
-    e.preventDefault(); // Prevent the default form submission
+    e.preventDefault();
 
-    // Add the regular expressions for password validation
     const passwordPattern = /^(?=.*[A-Z])(?=.*[!@#$%^&*])(.{8,})$/;
 
     if (!password.match(passwordPattern)) {
@@ -82,9 +82,7 @@ const SignupPage = () => {
       setError('Passwords do not match');
       return;
     }
-    
 
-    // Construct the request body
     const requestBody = {
       username,
       email,
@@ -92,8 +90,6 @@ const SignupPage = () => {
       confirmPassword,
     };
 
-    // Implement your signup logic here
-    // For example, make a POST request to create a new user
     fetch('https://100088.pythonanywhere.com/api/wallet/v1/signup', {
       method: 'POST',
       headers: {
@@ -103,11 +99,10 @@ const SignupPage = () => {
     })
       .then(async (response) => {
         if (response.ok) {
-          // Signup was successful, you can redirect to OTP verification page
           setResponse('Signup successful. You can now verify your OTP.');
-          setError(null); // Clear the error message
+          setError(null);
           setUsername('');
-          setEmailInContext(email); // Set the email in the context
+          setEmailInContext(email);
           setPassword('');
           setConfirmPassword('');
           navigate('/otp-verification');
@@ -166,7 +161,7 @@ const SignupPage = () => {
             style={inputStyle}
             id="password"
             name="password"
-            type="password"
+            type={showPassword ? 'text' : 'password'} // Toggle between 'text' and 'password'
             required
             value={password}
             onChange={(e) => setPassword(e.target.value)}
@@ -180,10 +175,21 @@ const SignupPage = () => {
             style={inputStyle}
             id="confirmPassword"
             name="confirmPassword"
-            type="password"
+            type={showPassword ? 'text' : 'password'} // Toggle between 'text' and 'password'
             required
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
+          />
+        </div>
+        <div>
+          <label style={labelStyle} htmlFor="show-password">
+            Show Password
+          </label>
+          <input
+            type="checkbox"
+            id="show-password"
+            checked={showPassword}
+            onChange={() => setShowPassword(!showPassword)} // Toggle password visibility
           />
         </div>
         {response && <div style={{ color: 'green', marginBottom: '1rem' }}>{response}</div>}
