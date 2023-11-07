@@ -180,6 +180,11 @@ const HomePage = () => {
             </Link>
           </div>
           <div>
+            <Link to="/settings" style={navItemStyle}>
+              Settings
+            </Link>
+            </div>
+          <div>
             <span style={navItemStyle} onClick={handleLogout}>
               Logout
             </span>

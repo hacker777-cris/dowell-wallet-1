@@ -61,6 +61,11 @@ const TransferPage = () => {
   const [accountNo, setAccountNo] = useState('');
   const [amount, setAmount] = useState('');
   const [error, setError] = useState(null);
+  const [isConfirmed, setIsConfirmed] = useState(false);
+
+  const handleConfirmation = () => {
+    setIsConfirmed(true);
+  };
 
   const handleTransfer = () => {
     const storedAccessToken = TokenManager.getToken(); // Retrieve the access token using TokenManager
@@ -112,32 +117,48 @@ const TransferPage = () => {
         <h1>Transfer Funds</h1>
         <Link to="/">Home</Link>
       </header>
-      <div style={formContainerStyle}>
-        <form>
-          <label htmlFor="accountNo">Recipient's Account Number</label>
-          <input
-            type="text"
-            id="accountNo"
-            name="accountNo"
-            value={accountNo}
-            onChange={(e) => setAccountNo(e.target.value)}
-            style={inputStyle}
-          />
-          <label htmlFor="amount">Amount</label>
-          <input
-            type="text"
-            id="amount"
-            name="amount"
-            value={amount}
-            onChange={(e) => setAmount(e.target.value)}
-            style={inputStyle}
-          />
-          <ErrorMessage error={error} />
+      {isConfirmed ? (
+        // Confirmation screen
+        <div style={formContainerStyle}>
+          <h2>Confirm Transfer</h2>
+          <p>Recipient's Account Number: {accountNo}</p>
+          <p>Amount: {amount}</p>
           <button type="button" onClick={handleTransfer} style={buttonStyle}>
-            Transfer
+            Confirm
           </button>
-        </form>
-      </div>
+          <button type="button" onClick={() => setIsConfirmed(false)} style={buttonStyle}>
+            Cancel
+          </button>
+        </div>
+      ) : (
+        // Transfer form
+        <div style={formContainerStyle}>
+          <form>
+            <label htmlFor="accountNo">Recipient's Account Number</label>
+            <input
+              type="text"
+              id="accountNo"
+              name="accountNo"
+              value={accountNo}
+              onChange={(e) => setAccountNo(e.target.value)}
+              style={inputStyle}
+            />
+            <label htmlFor="amount">Amount</label>
+            <input
+              type="text"
+              id="amount"
+              name="amount"
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+              style={inputStyle}
+            />
+            <ErrorMessage error={error} />
+            <button type="button" onClick={handleConfirmation} style={buttonStyle}>
+              Next
+            </button>
+          </form>
+        </div>
+      )}
     </div>
   );
 };

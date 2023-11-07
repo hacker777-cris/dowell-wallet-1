@@ -139,10 +139,16 @@ const LoginPage = () => {
             </button>
           </div>
           <div>
-            <a href="signup" style={linkStyle}>
+            <a href="/signup" style={linkStyle}>
               Not registered yet? Sign up
             </a>
           </div>
+          <div>
+            <a href="/password-reset" style={linkStyle}>
+              Forgot Password?
+            </a>
+          </div>
+
         </form>
       </div>
     );
