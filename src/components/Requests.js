@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { TokenManager } from './Tokenmanager'; // Import the TokenManager
+import { useUser } from '../UserContext'; // Import the useUser hook;
 
 const cardStyle = {
   backgroundColor: '#fff',
@@ -23,16 +25,50 @@ const buttonStyle = {
 };
 
 const RequestsPage = () => {
-  // State to store received results
   const [receivedResults, setReceivedResults] = useState([]);
+  const navigate = useNavigate();
+  const { setAccessToken } = useUser();
 
   useEffect(() => {
-    // Fetch and set received results here
-    // Example:
-    // fetch('API endpoint to get received results')
-    //   .then((response) => response.json())
-    //   .then((data) => setReceivedResults(data));
-  }, []);
+    // Retrieve the access token from the TokenManager
+    const storedAccessToken = TokenManager.getToken();
+
+    if (!storedAccessToken) {
+      navigate('/login');
+      return;
+    }
+    setAccessToken(storedAccessToken);
+
+    // Make a GET request to retrieve user requests
+    fetch('https://100088.pythonanywhere.com/api/wallet/v1/user-request', {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${storedAccessToken}`,
+      },
+    })
+      .then((response) => {
+        if (response.ok) {
+          return response.json();
+        } else {
+          throw new Error('Failed to fetch user requests');
+        }
+      })
+      .then((data) => setReceivedResults(data.data))
+      .catch((error) => {
+        console.error(error);
+        // Handle the error or show an error message to the user
+      });
+  }, [navigate, setAccessToken]);
+
+  const handleConfirm = (requestId) => {
+    // Implement the logic to confirm the request with the given ID
+    console.log(`Confirmed request with ID: ${requestId}`);
+  };
+
+  const handleCancel = (requestId) => {
+    // Implement the logic to cancel the request with the given ID
+    console.log(`Cancelled request with ID: ${requestId}`);
+  };
 
   return (
     <div style={cardStyle}>
@@ -50,7 +86,14 @@ const RequestsPage = () => {
               padding: '0.5rem 0',
             }}
           >
-            {result.text}
+            Request ID: {result.custom_id}
+            <br />
+            Amount: ${result.amount}
+            <br />
+            Created At: {new Date(result.created_at).toLocaleString()}
+            <br />
+            <button onClick={() => handleConfirm(result.id)}>Confirm</button>
+            <button onClick={() => handleCancel(result.id)}>Cancel</button>
           </li>
         ))}
       </ul>
