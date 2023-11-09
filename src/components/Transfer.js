@@ -123,6 +123,7 @@ const TransferPage = () => {
           <h2>Confirm Transfer</h2>
           <p>Recipient's Account Number: {accountNo}</p>
           <p>Amount: {amount}</p>
+          <div style={errorStyle}>{error}</div>
           <button type="button" onClick={handleTransfer} style={buttonStyle}>
             Confirm
           </button>

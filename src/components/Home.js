@@ -184,6 +184,11 @@ const HomePage = () => {
               Settings
             </Link>
             </div>
+            <div>
+            <Link to="/request" style={navItemStyle}>
+              Requests
+            </Link>
+            </div>
           <div>
             <span style={navItemStyle} onClick={handleLogout}>
               Logout

@@ -60,7 +60,11 @@ const linkStyle = {
 const SignupPage = () => {
   const { setEmail: setEmailInContext } = useUser();
   const navigate = useNavigate();
-  const [username, setUsername] = useState('');
+  
+  // New state variables
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -84,7 +88,9 @@ const SignupPage = () => {
     }
 
     const requestBody = {
-      username,
+      first_name: firstName,
+      last_name: lastName,
+      phone_number: phoneNumber,
       email,
       password,
       confirmPassword,
@@ -101,7 +107,9 @@ const SignupPage = () => {
         if (response.ok) {
           setResponse('Signup successful. You can now verify your OTP.');
           setError(null);
-          setUsername('');
+          setFirstName(''); // Clear the new fields
+          setLastName('');
+          setPhoneNumber('');
           setEmailInContext(email);
           setPassword('');
           setConfirmPassword('');
@@ -126,17 +134,45 @@ const SignupPage = () => {
         <h1 style={headingStyle}>Signup</h1>
         {error && <div style={{ color: 'red', marginBottom: '1rem' }}>{error}</div>}
         <div>
-          <label style={labelStyle} htmlFor="username">
-            Username:
+          <label style={labelStyle} htmlFor="first_name">
+            First Name:
           </label>
           <input
             style={inputStyle}
-            id="username"
-            name="username"
+            id="first_name"
+            name="first_name"
             type="text"
             required
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
+            value={firstName}
+            onChange={(e) => setFirstName(e.target.value)}
+          />
+        </div>
+        <div>
+          <label style={labelStyle} htmlFor="last_name">
+            Last Name:
+          </label>
+          <input
+            style={inputStyle}
+            id="last_name"
+            name="last_name"
+            type="text"
+            required
+            value={lastName}
+            onChange={(e) => setLastName(e.target.value)}
+          />
+        </div>
+        <div>
+          <label style={labelStyle} htmlFor="phone_number">
+            Phone Number:
+          </label>
+          <input
+            style={inputStyle}
+            id="phone_number"
+            name="phone_number"
+            type="text"
+            required
+            value={phoneNumber}
+            onChange={(e) => setPhoneNumber(e.target.value)}
           />
         </div>
         <div>

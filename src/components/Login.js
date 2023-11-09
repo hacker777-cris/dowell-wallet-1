@@ -58,7 +58,7 @@ const linkStyle = {
   fontSize: '0.875rem',
 };
 
-const LoginPage = () => {
+const LoginPage = () => {  
   const { setAccessToken } = useUser();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');

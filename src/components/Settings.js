@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { TokenManager } from './Tokenmanager'; // Import the TokenManager
+import { Link, useNavigate } from 'react-router-dom';
 
 const containerStyle = {
   maxWidth: '800px',
@@ -33,21 +34,6 @@ const buttonStyle = {
   cursor: 'pointer',
 };
 
-const labelStyle = {
-  fontSize: '18px',
-  color: '#0070BA',
-  marginBottom: '10px',
-};
-
-const inputStyle = {
-  padding: '10px',
-  borderRadius: '4px',
-  border: '1px solid #ccc',
-  marginBottom: '20px',
-  width: '100%',
-  fontSize: '16px',
-};
-
 const checkboxLabelStyle = {
   display: 'flex',
   alignItems: 'center',
@@ -60,25 +46,51 @@ const checkboxStyle = {
 };
 
 const SettingsPage = () => {
-  const [currentPassword, setCurrentPassword] = useState('');
-  const [newPassword, setNewPassword] = useState('');
-  const [confirmNewPassword, setConfirmNewPassword] = useState('');
   const [deleteAccount, setDeleteAccount] = useState(false);
   const [disableAccount, setDisableAccount] = useState(false);
-  const [error, setError] = useState('');
-  const [message, setMessage] = useState('');
-
-  const handleChangePassword = () => {
-    // Implement password change logic here
-    // Check if the current password is correct, and if the new password and confirm new password match
-  };
+  const [showOTPSection, setShowOTPSection] = useState(false);
+  const [otp, setOTP] = useState('');
+  const [error, setError] = useState(''); // State to store error messages
+  const navigate = useNavigate();
 
   const handleDeleteAccount = () => {
     // Implement account deletion logic here
   };
 
   const handleDisableAccount = () => {
-    // Implement account disabling logic here
+    const storedAccessToken = TokenManager.getToken();
+
+    if (!storedAccessToken) {
+      navigate('/login');
+      return;
+    }
+
+    fetch('https://100088.pythonanywhere.com/api/wallet/v1/request-disable', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${storedAccessToken}`,
+      },
+    })
+      .then((response) => {
+        if (response.status === 200) {
+          setShowOTPSection(true);
+        } else {
+          response.json().then((data) => {
+            setError(data.message || 'Account disabling request failed. Please try again.');
+          });
+        }
+      })
+      .catch((error) => {
+        console.error('Error sending account disabling request:', error);
+        setError('An error occurred while sending the request.');
+      });
+  };
+
+  const handleVerifyOTP = () => {
+    // Implement OTP verification logic here
+    // After OTP verification, you can navigate the user or perform any other actions
+    // For example, navigate to a success page or perform account disabling
   };
 
   return (
@@ -87,58 +99,7 @@ const SettingsPage = () => {
         <h1>Account Settings</h1>
         <Link to="/">Home</Link>
       </header>
-      <div style={sectionStyle}>
-        <h2 style={{ fontSize: '24px', marginBottom: '20px' }}>Change Password</h2>
-        <label style={labelStyle} htmlFor="currentPassword">
-          Current Password:
-        </label>
-        <input
-          style={inputStyle}
-          type="password"
-          id="currentPassword"
-          value={currentPassword}
-          onChange={(e) => setCurrentPassword(e.target.value)}
-        />
-        <label style={labelStyle} htmlFor="newPassword">
-          New Password:
-        </label>
-        <input
-          style={inputStyle}
-          type="password"
-          id="newPassword"
-          value={newPassword}
-          onChange={(e) => setNewPassword(e.target.value)}
-        />
-        <label style={labelStyle} htmlFor="confirmNewPassword">
-          Confirm New Password:
-        </label>
-        <input
-          style={inputStyle}
-          type="password"
-          id="confirmNewPassword"
-          value={confirmNewPassword}
-          onChange={(e) => setConfirmNewPassword(e.target.value)}
-        />
-        <button style={buttonStyle} onClick={handleChangePassword}>
-          Change Password
-        </button>
-        {error && <p style={{ color: 'red', fontSize: '18px', marginTop: '10px' }}>{error}</p>}
-        {message && <p style={{ color: 'green', fontSize: '18px', marginTop: '10px' }}>{message}</p>}
-      </div>
-      <div style={sectionStyle}>
-        <h2 style={{ fontSize: '24px', marginBottom: '20px' }}>Delete Account</h2>
-        <p style={{ fontSize: '18px', marginBottom: '20px' }}>
-          By deleting your account, all your data will be permanently removed from our system.
-          This action cannot be undone.
-        </p>
-        <label style={checkboxLabelStyle}>
-          <input type="checkbox" checked={deleteAccount} onChange={() => setDeleteAccount(!deleteAccount)} style={checkboxStyle} />
-          I understand and want to delete my account
-        </label>
-        <button style={buttonStyle} onClick={handleDeleteAccount}>
-          Delete Account
-        </button>
-      </div>
+
       <div style={sectionStyle}>
         <h2 style={{ fontSize: '24px', marginBottom: '20px' }}>Disable Account</h2>
         <p style={{ fontSize: '18px', marginBottom: '20px' }}>
@@ -146,11 +107,53 @@ const SettingsPage = () => {
           This action can be reversed by re-enabling the account.
         </p>
         <label style={checkboxLabelStyle}>
-          <input type="checkbox" checked={disableAccount} onChange={() => setDisableAccount(!disableAccount)} style={checkboxStyle} />
+          <input
+            type="checkbox"
+            checked={disableAccount}
+            onChange={() => setDisableAccount(!disableAccount)}
+            style={checkboxStyle}
+          />
           I understand and want to disable my account
         </label>
         <button style={buttonStyle} onClick={handleDisableAccount}>
           Disable Account
+        </button>
+      </div>
+
+      {showOTPSection && (
+        <div style={sectionStyle}>
+          <h2 style={{ fontSize: '24px', marginBottom: '20px' }}>OTP Verification</h2>
+          <p style={{ fontSize: '18px', marginBottom: '20px' }}>
+            Enter the OTP sent to your email or phone number.
+          </p>
+          {error && <div style={{ color: 'red' }}>{error}</div>}
+          <input
+            type="text"
+            placeholder="Enter OTP"
+            value={otp}
+            onChange={(e) => setOTP(e.target.value)}
+          />
+          <button onClick={handleVerifyOTP}>Verify OTP</button>
+        </div>
+      )}
+
+      <div style={sectionStyle}>
+        <h2 style={{ fontSize: '24px', marginBottom: '20px' }}>Delete Account</h2>
+        <p style={{ fontSize: '18px', marginBottom: '20px' }}>
+          By deleting your account, all your data will be permanently removed from our system.
+          This action cannot be undone.
+        </p>
+        <label style={checkboxLabelStyle}>
+          <input
+            type="checkbox"
+            checked={deleteAccount}
+            onChange={() => setDeleteAccount(!deleteAccount)}
+            style={checkboxStyle}
+          />
+          I understand and want to delete my account
+        </label>
+        <button style={buttonStyle} onClick={handleDeleteAccount}>
+          Delete Account
         </button>
       </div>
     </div>
