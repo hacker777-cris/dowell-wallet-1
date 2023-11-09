@@ -4,7 +4,7 @@ import { TokenManager } from './Tokenmanager'; // Import the TokenManager
 import { useUser } from '../UserContext'; // Import the useUser hook;
 
 const cardStyle = {
-  backgroundColor: '#fff',
+  backgroundColor: '#f1f1f1',
   boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
   borderRadius: '0.375rem',
   padding: '1.5rem',
@@ -13,14 +13,31 @@ const cardStyle = {
   textAlign: 'center',
 };
 
+const cardHeader = {
+  backgroundColor: '#009cde',
+  color: '#fff',
+  fontSize: '1.25rem',
+  fontWeight: 'bold',
+  padding: '1rem 0',
+  borderRadius: '0.375rem 0.375rem 0 0',
+};
+
+const requestCard = {
+  backgroundColor: '#fff',
+  border: '1px solid #ccc',
+  borderRadius: '0.375rem',
+  padding: '1rem',
+  margin: '1rem 0',
+  boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+};
+
 const buttonStyle = {
-  backgroundColor: '#4299e1',
-  color: '#ffffff',
+  backgroundColor: '#009cde',
+  color: '#fff',
   borderRadius: '0.25rem',
   padding: '0.5rem 1rem',
   fontSize: '0.875rem',
   cursor: 'pointer',
-  marginTop: '1rem',
   textDecoration: 'none',
 };
 
@@ -72,32 +89,24 @@ const RequestsPage = () => {
 
   return (
     <div style={cardStyle}>
-      <h1 style={{ fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '1rem' }}>
-        Received Results
-      </h1>
-      <ul>
-        {receivedResults.map((result) => (
-          <li
-            key={result.id}
-            style={{
-              fontSize: '0.875rem',
-              marginBottom: '0.5rem',
-              borderBottom: '1px solid #ccc',
-              padding: '0.5rem 0',
-            }}
-          >
-            Request ID: {result.custom_id}
-            <br />
-            Amount: ${result.amount}
-            <br />
-            Created At: {new Date(result.created_at).toLocaleString()}
-            <br />
-            <button onClick={() => handleConfirm(result.id)}>Confirm</button>
-            <button onClick={() => handleCancel(result.id)}>Cancel</button>
-          </li>
-        ))}
-      </ul>
-
+      <div style={cardHeader}>Received Requests</div>
+      {receivedResults.map((result) => (
+        <div key={result.id} style={requestCard}>
+          <div>
+            <strong>Request ID: {result.custom_id}</strong>
+          </div>
+          <div>Amount: ${result.amount}</div>
+          <div>Created At: {new Date(result.created_at).toLocaleString()}</div>
+          <div>
+            <button onClick={() => handleConfirm(result.id)} style={buttonStyle}>
+              Confirm
+            </button>
+            <button onClick={() => handleCancel(result.id)} style={buttonStyle}>
+              Cancel
+            </button>
+          </div>
+        </div>
+      ))}
       <Link to="/create-request" style={buttonStyle}>
         Create New Request
       </Link>
