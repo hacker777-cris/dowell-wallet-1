@@ -133,7 +133,13 @@ const ProfilePage = () => {
           <strong>Last Name:</strong> {profileData.lastname}
         </div>
         <div style={detailStyle}>
+          <strong>Email:</strong> {profileData.email}
+        </div>
+        <div style={detailStyle}>
           <strong>Phone Number:</strong> {profileData.phone_number}
+        </div>
+        <div style={detailStyle}>
+          <strong>Wallet Account Number:</strong> {profileData.account_no}
         </div>
       </div>
     </div>

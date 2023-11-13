@@ -191,6 +191,7 @@ const RequestsPage = () => {
             </button>
             <button onClick={() => handleCancel(result.id)} style={buttonStyle}>
               Cancel
+
             </button>
           </div>
         </div>
