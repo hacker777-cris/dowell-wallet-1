@@ -80,13 +80,13 @@ const RequestsPage = () => {
 
   useEffect(() => {
     const storedAccessToken = TokenManager.getToken();
-
+  
     if (!storedAccessToken) {
       navigate('/login');
       return;
     }
     setAccessToken(storedAccessToken);
-
+  
     fetch('https://100088.pythonanywhere.com/api/wallet/v1/user-request', {
       method: 'GET',
       headers: {
@@ -100,15 +100,22 @@ const RequestsPage = () => {
           throw new Error('Failed to fetch user requests');
         }
       })
-      .then((data) => setReceivedResults(data.data))
+      .then((data) => {
+        // Combine confirmed and pending requests into a single array
+        const allRequests = data.data.confirmed_requests.concat(data.data.pending_requests);
+        setReceivedResults(allRequests);
+      })
       .catch((error) => {
         console.error(error);
       });
   }, [navigate, setAccessToken]);
+  
 
-  const handleConfirm = (requestId) => {
+  const handleConfirm = (customId) => {
+    console.log('Confirm Request Payload:', { custom_id: customId });
+  
     const storedAccessToken = TokenManager.getToken();
-
+  
     fetch('https://100088.pythonanywhere.com/api/wallet/v1/accept-request', {
       method: 'POST',
       headers: {
@@ -116,7 +123,7 @@ const RequestsPage = () => {
         Authorization: `Bearer ${storedAccessToken}`,
       },
       body: JSON.stringify({
-        custom_id: requestId,
+        custom_id: customId,
       }),
     })
       .then((response) => {
@@ -129,11 +136,13 @@ const RequestsPage = () => {
       })
       .catch((error) => {
         console.error(error);
+        console.log(customId);
       });
   };
+  
 
-  const handleCancel = (requestId) => {
-    console.log(`Cancelled request with ID: ${requestId}`);
+  const handleCancel = (customId) => {
+    console.log(`Cancelled request with ID: ${customId}`);
   };
 
   const handleCreateRequestClick = () => {
@@ -178,24 +187,33 @@ const RequestsPage = () => {
     <div style={cardStyle}>
       <div style={cardHeader}>Received Requests</div>
       {successMessage && <div style={{ color: 'green', marginBottom: '1rem' }}>{successMessage}</div>}
-      {receivedResults.map((result) => (
-        <div key={result.id} style={requestCard}>
-          <div>
-            <strong>Request ID: {result.custom_id}</strong>
+      {Array.isArray(receivedResults) ? (
+        receivedResults.map((result) => (
+          <div key={result.id} style={requestCard}>
+            <div>
+              <strong>Request ID: {result.custom_id}</strong>
+            </div>
+            <div>Amount: ${result.amount}</div>
+            <div>Created At: {new Date(result.created_at).toLocaleString()}</div>
+            <div>
+              {result.is_confirmed ? (
+                <div style={{ color: 'green' }}>Confirmed</div>
+              ) : (
+                <React.Fragment>
+                  <button onClick={() => handleConfirm(result.custom_id.toString())} style={buttonStyle}>
+                    Confirm
+                  </button>
+                  <button onClick={() => handleCancel(result.id)} style={buttonStyle}>
+                    Cancel
+                  </button>
+                </React.Fragment>
+              )}
+            </div>
           </div>
-          <div>Amount: ${result.amount}</div>
-          <div>Created At: {new Date(result.created_at).toLocaleString()}</div>
-          <div>
-            <button onClick={() => handleConfirm(result.id)} style={buttonStyle}>
-              Confirm
-            </button>
-            <button onClick={() => handleCancel(result.id)} style={buttonStyle}>
-              Cancel
-
-            </button>
-          </div>
-        </div>
-      ))}
+        ))
+      ) : (
+        <div>No received requests</div>
+      )}
       <button onClick={handleCreateRequestClick} style={buttonStyle}>
         Create New Request
       </button>
@@ -206,23 +224,13 @@ const RequestsPage = () => {
             <label htmlFor="accountNumber" style={labelStyle}>
               Account Number:
             </label>
-            <input
-              type="text"
-              id="accountNumber"
-              style={inputStyle}
-              // Add your input field styles
-            />
+            <input type="text" id="accountNumber" style={inputStyle} />
           </div>
           <div style={inputContainer}>
             <label htmlFor="amount" style={labelStyle}>
               Amount:
             </label>
-            <input
-              type="text"
-              id="amount"
-              style={inputStyle}
-              // Add your input field styles
-            />
+            <input type="text" id="amount" style={inputStyle} />
           </div>
           <button onClick={handleCloseCreateRequest} style={buttonStyle}>
             Close

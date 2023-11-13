@@ -71,6 +71,7 @@ const SignupPage = () => {
   const [showPassword, setShowPassword] = useState(false); // State to toggle password visibility
   const [response, setResponse] = useState('');
   const [error, setError] = useState(null);
+  
 
   const handleSignup = (e) => {
     e.preventDefault();
