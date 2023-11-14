@@ -109,6 +109,17 @@ const RequestsPage = () => {
         console.error(error);
       });
   }, [navigate, setAccessToken]);
+
+  useEffect(() => {
+    if (successMessage) {
+      const timeoutId = setTimeout(() => {
+        setSuccessMessage('');
+        window.location.reload(); // Reload the page
+      }, 3000);
+
+      return () => clearTimeout(timeoutId); // Cleanup on component unmount
+    }
+  }, [successMessage]);
   
 
   const handleConfirm = (customId) => {
