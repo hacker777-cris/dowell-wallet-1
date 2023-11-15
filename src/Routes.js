@@ -21,8 +21,8 @@ function AppRoutes() {
       <Route path="signup" element={<SignUp />} />
       <Route path="password-reset" element={<PasswordResetPage />} />
       <Route path="otp-verification" element={<Otpverification/>}/>
-      <Route path="transfer" element={<Transfer />} />
-      <Route path="request" element={<Requests />} />
+      {/* <Route path="transfer" element={<Transfer />} /> */}
+      {/* <Route path="request" element={<Requests />} /> */}
       <Route path="profile" element={<Profile />} />
       <Route path="settings" element={<Settings />} />
       <Route path="update-profile" element={<UpdateProfile />} />

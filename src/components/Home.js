@@ -184,11 +184,11 @@ const HomePage = () => {
               Settings
             </Link>
             </div>
-            <div>
+            {/* <div>
             <Link to="/request" style={navItemStyle}>
               Requests
             </Link>
-            </div>
+            </div> */}
           <div>
             <span style={navItemStyle} onClick={handleLogout}>
               Logout
@@ -211,9 +211,9 @@ const HomePage = () => {
               Top Up
             </button>
           )}
-          <Link to="/transfer" style={transferButtonStyle}>
+          {/* <Link to="/transfer" style={transferButtonStyle}>
             Transfer
-          </Link>
+          </Link> */}
         </div>
       </div>
       <div style={recentTransactionsStyle}>
