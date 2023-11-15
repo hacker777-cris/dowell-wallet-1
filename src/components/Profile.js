@@ -136,6 +136,9 @@ const ProfilePage = () => {
           <strong>Email:</strong> {profileData.email}
         </div>
         <div style={detailStyle}>
+          <strong>Address:</strong> {profileData.address}
+        </div>
+        <div style={detailStyle}>
           <strong>Phone Number:</strong> {profileData.phone_number}
         </div>
         <div style={detailStyle}>
