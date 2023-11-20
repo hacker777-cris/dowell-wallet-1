@@ -9,7 +9,7 @@ import UpdateProfile from './components/UpdateProfile';
 import Deposit from './components/Deposit';
 import PasswordReset from './components/PasswordReset';
 import Settings from './components/Settings';
-import Requests from './components/Requests';
+import DowellPay from './components/store';
 import Otpverification from './components/Otpverification';
 import PasswordResetPage from './components/PasswordReset';
 
@@ -22,7 +22,7 @@ function AppRoutes() {
       <Route path="password-reset" element={<PasswordResetPage />} />
       <Route path="otp-verification" element={<Otpverification/>}/>
       <Route path="payment-login" element={<PaymentLogin/>} />
-      {/* <Route path="request" element={<Requests />} /> */}
+      <Route path="dowell-pay" element={<DowellPay />} />
       <Route path="profile" element={<Profile />} />
       <Route path="settings" element={<Settings />} />
       <Route path="update-profile" element={<UpdateProfile />} />

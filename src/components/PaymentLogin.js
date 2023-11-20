@@ -26,7 +26,7 @@ const LoginForm = () => {
 
   const handleFormSubmit = async (event) => {
     event.preventDefault();
-
+  
     try {
       const response = await fetch('YOUR_API_ENDPOINT/login', {
         method: 'POST',
@@ -39,11 +39,19 @@ const LoginForm = () => {
           initiation_id: initiationId, // Send initiation_id in the body
         }),
       });
-
+  
       if (response.ok) {
         const data = await response.json();
         // Handle response data or redirect after successful login
         console.log('Login response:', data);
+  
+        // Check if there's a callback URL in the response data
+        if (data.callback_url) {
+          window.location.href = data.callback_url; // Redirect to the callback URL
+        } else {
+          console.error('No callback URL received');
+          // Handle this case accordingly
+        }
       } else {
         // Handle unsuccessful response (e.g., display an error message)
         console.error('Login failed:', response.statusText);
