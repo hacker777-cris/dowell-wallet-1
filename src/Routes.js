@@ -3,7 +3,7 @@ import { Route, Routes } from 'react-router-dom';
 import Home from './components/Home';
 import Login from './components/Login';
 import SignUp from './components/SignUp';
-import Transfer from './components/Transfer';
+import PaymentLogin from './components/PaymentLogin';
 import Profile from './components/Profile';
 import UpdateProfile from './components/UpdateProfile';
 import Deposit from './components/Deposit';
@@ -21,7 +21,7 @@ function AppRoutes() {
       <Route path="signup" element={<SignUp />} />
       <Route path="password-reset" element={<PasswordResetPage />} />
       <Route path="otp-verification" element={<Otpverification/>}/>
-      {/* <Route path="transfer" element={<Transfer />} /> */}
+      <Route path="payment-login" element={<PaymentLogin/>} />
       {/* <Route path="request" element={<Requests />} /> */}
       <Route path="profile" element={<Profile />} />
       <Route path="settings" element={<Settings />} />
