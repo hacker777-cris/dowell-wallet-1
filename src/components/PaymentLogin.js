@@ -28,7 +28,7 @@ const LoginForm = () => {
     event.preventDefault();
   
     try {
-      const response = await fetch('YOUR_API_ENDPOINT/login', {
+      const response = await fetch('api/wallet/v1/payment-login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
