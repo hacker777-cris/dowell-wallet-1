@@ -26,6 +26,7 @@ const LoginForm = () => {
 
   const handleFormSubmit = async (event) => {
     event.preventDefault();
+    console.log('Initialization ID:', initiationId);
   
     try {
       const response = await fetch('https://100088.pythonanywhere.com/api/wallet/v1/verify-payment', {
@@ -36,31 +37,29 @@ const LoginForm = () => {
         body: JSON.stringify({
           email,
           password,
-          initialization_id: initiationId, // Send initiation_id in the body
+          initialization_id: initiationId,
         }),
       });
   
-      if (response.ok) {
-        const data = await response.json();
-        // Handle response data or redirect after successful login
-        console.log('Login response:', data);
+      if (!response.ok) {
+        const errorData = await response.json(); // Attempt to parse error response
+        console.error('Login failed:', errorData.error || 'Unknown error');
+        return; // Exit function early if there's an error
+      }
   
-        // Check if there's a callback URL in the response data
-        if (data.callback_url) {
-          window.location.href = data.callback_url; // Redirect to the callback URL
-        } else {
-          console.error('No callback URL received');
-          // Handle this case accordingly
-        }
+      const data = await response.json();
+      console.log('Login response:', data);
+  
+      if (data.callback_url) {
+        window.location.href = data.callback_url;
       } else {
-        // Handle unsuccessful response (e.g., display an error message)
-        console.error('Login failed:', response.statusText);
+        console.error('No callback URL received');
       }
     } catch (error) {
-      // Handle error
       console.error('Login error:', error);
     }
   };
+  
 
   return (
     <div style={{ textAlign: 'center', marginTop: '100px' }}>
