@@ -10,7 +10,7 @@ const LoginForm = () => {
   useEffect(() => {
     // Extract initiation_id from URL params
     const searchParams = new URLSearchParams(location.search);
-    const initiationIdFromParams = searchParams.get('initiation_id');
+    const initiationIdFromParams = searchParams.get('initialization_id');
     console.log('Initiation ID from URL:', initiationIdFromParams);
     
     if (initiationIdFromParams) {
