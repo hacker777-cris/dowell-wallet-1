@@ -36,7 +36,7 @@ const LoginForm = () => {
         body: JSON.stringify({
           email,
           password,
-          initiation_id: initiationId, // Send initiation_id in the body
+          initialization_id: initiationId, // Send initiation_id in the body
         }),
       });
   
