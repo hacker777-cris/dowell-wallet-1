@@ -28,7 +28,7 @@ const LoginForm = () => {
     event.preventDefault();
   
     try {
-      const response = await fetch('api/wallet/v1/payment-login', {
+      const response = await fetch('100088.pythonanywhere.com/api/wallet/v1/verify-payment', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
