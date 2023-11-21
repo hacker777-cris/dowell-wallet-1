@@ -53,7 +53,7 @@ const LoginForm = () => {
       const data = await response.json();
       console.log('Login response:', data);
   
-      if (data.callback_url) {
+      if (data.redirect_url) {
         window.location.href = data.redirect_url;
       } else {
         console.error('No callback URL received');
