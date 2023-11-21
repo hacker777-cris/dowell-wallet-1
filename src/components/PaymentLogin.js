@@ -4,17 +4,17 @@ import { useLocation } from 'react-router-dom'; // Assuming React Router is used
 const LoginForm = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [initiationId, setInitiationId] = useState('');
+  const [initializationId, setinitializationId] = useState('');
   const location = useLocation();
 
   useEffect(() => {
     // Extract initiation_id from URL params
     const searchParams = new URLSearchParams(location.search);
-    const initiationIdFromParams = searchParams.get('initialization_id');
-    console.log('Initiation ID from URL:', initiationIdFromParams);
+    const initializationIdFromParams = searchParams.get('initialization_id');
+    console.log('initialization ID from URL:', initializationIdFromParams);
     
-    if (initiationIdFromParams) {
-      setInitiationId(initiationIdFromParams);
+    if (initializationIdFromParams) {
+      setinitializationId(initializationIdFromParams);
     }
   }, [location.search]);
   
@@ -29,7 +29,7 @@ const LoginForm = () => {
 
   const handleFormSubmit = async (event) => {
     event.preventDefault();
-    console.log('Initialization ID:', initiationId);
+    console.log('Initialization ID:', initializationId);
   
     try {
       const response = await fetch('https://100088.pythonanywhere.com/api/wallet/v1/verify-payment', {
@@ -40,7 +40,7 @@ const LoginForm = () => {
         body: JSON.stringify({
           email,
           password,
-          initialization_id: initiationId,
+          initialization_id: initializationId,
         }),
       });
   
