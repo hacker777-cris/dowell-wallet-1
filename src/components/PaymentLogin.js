@@ -11,10 +11,13 @@ const LoginForm = () => {
     // Extract initiation_id from URL params
     const searchParams = new URLSearchParams(location.search);
     const initiationIdFromParams = searchParams.get('initiation_id');
+    console.log('Initiation ID from URL:', initiationIdFromParams);
+    
     if (initiationIdFromParams) {
       setInitiationId(initiationIdFromParams);
     }
   }, [location.search]);
+  
 
   const handleEmailChange = (event) => {
     setEmail(event.target.value);
