@@ -8,6 +8,7 @@ const LoginForm = () => {
   const [showConfirmation, setShowConfirmation] = useState(false); // State to control confirmation dialog
   const [price, setPrice] = useState(0); // State to hold the price
   const location = useLocation();
+  const [isLoading, setIsLoading] = useState(false); // State for loading indicator
 
  
 useEffect(() => {
@@ -39,6 +40,7 @@ useEffect(() => {
   };
 
   const handleConfirmationSubmit = async () => {
+    setIsLoading(true); // Set loading state to true during payment processing
     setShowConfirmation(false); // Hide confirmation dialog
     try {
       // Proceed with the POST request after confirmation
@@ -70,6 +72,8 @@ useEffect(() => {
       }
     } catch (error) {
       console.error('Login error:', error);
+    }finally {
+      setIsLoading(false); // Set loading state back to false after payment processing is complete
     }
   };
 
@@ -152,7 +156,11 @@ useEffect(() => {
           </div>
         </div>
       )}
-
+      {isLoading && (
+      <div className="fixed top-0 left-0 right-0 bottom-0 flex items-center justify-center bg-gray-800 bg-opacity-50">
+        <div className="loader ease-linear rounded-full border-8 border-t-8 border-gray-200 h-24 w-24"></div>
+      </div>
+    )}
     </div>
     
   );
