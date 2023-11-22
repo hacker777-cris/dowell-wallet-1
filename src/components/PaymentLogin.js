@@ -132,12 +132,27 @@ useEffect(() => {
         </button>
       </form>
       {showConfirmation && (
-        <div className="confirmation-dialog">
-          <p>Confirm payment of ${price}?</p>
-          <button onClick={handleConfirmationSubmit}>Confirm</button>
-          <button onClick={() => setShowConfirmation(false)}>Cancel</button>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-800 bg-opacity-50">
+          <div className="bg-white p-6 rounded shadow-lg">
+            <p className="text-lg mb-4">Confirm payment of ${price}?</p>
+            <div className="flex justify-end">
+              <button
+                onClick={handleConfirmationSubmit}
+                className="px-4 py-2 bg-blue-500 text-white rounded mr-2 hover:bg-blue-600 focus:outline-none"
+              >
+                Confirm
+              </button>
+              <button
+                onClick={() => setShowConfirmation(false)}
+                className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 focus:outline-none"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
         </div>
       )}
+
     </div>
     
   );
