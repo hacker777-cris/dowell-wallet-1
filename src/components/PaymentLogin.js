@@ -4,7 +4,9 @@ import { useLocation } from 'react-router-dom'; // Assuming React Router is used
 const LoginForm = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [initializationId, setinitializationId] = useState('');
+  const [initializationId, setInitializationId] = useState('');
+  const [showConfirmation, setShowConfirmation] = useState(false); // State to control confirmation dialog
+  const [price, setPrice] = useState(0); // State to hold the price
   const location = useLocation();
 
  
@@ -14,7 +16,9 @@ useEffect(() => {
   const initializationIdFromParams = searchParams.get('initialization_id');
   const priceFromParams = searchParams.get('price'); // Extract price from URL params
   console.log('initialization ID from URL:', initializationIdFromParams);
-  console.log('Price from URL:', priceFromParams);
+  console.log('Price from URL is:', priceFromParams);
+
+
 
   if (initializationIdFromParams) {
     setInitializationId(initializationIdFromParams);
