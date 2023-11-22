@@ -5,6 +5,7 @@ import Laptopimage from '../images/laptop.jpg' ;
 
 const Store = () => {
   const [selectedProduct, setSelectedProduct] = useState(null);
+  const [isLoading, setIsLoading] = useState(false); // State for loading indicator
 
   const products = [
     { id: 1, name: 'Iphone', price: 20, currency: 'USD', image: Iphoneimage },
@@ -22,6 +23,7 @@ const Store = () => {
   };
 
   const handlePayment = async () => {
+    setIsLoading(true); // Set loading state to true during payment processing
     const { price, currency } = selectedProduct;
     const currentUrl = window.location.href;
 
@@ -56,6 +58,8 @@ const Store = () => {
     } catch (error) {
       // Handle error
       console.error('Initialization error:', error);
+    } finally {
+      setIsLoading(false); // Set loading state back to false after payment processing is complete
     }
   };
 
@@ -132,6 +136,11 @@ const Store = () => {
           </button>
         </div>
       )}
+      {isLoading && (
+      <div className="fixed top-0 left-0 right-0 bottom-0 flex items-center justify-center bg-gray-800 bg-opacity-50">
+        <div className="loader ease-linear rounded-full border-8 border-t-8 border-gray-200 h-24 w-24"></div>
+      </div>
+    )}
     </div>
   );
 };
