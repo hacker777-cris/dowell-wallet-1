@@ -7,16 +7,23 @@ const LoginForm = () => {
   const [initializationId, setinitializationId] = useState('');
   const location = useLocation();
 
-  useEffect(() => {
-    // Extract initiation_id from URL params
-    const searchParams = new URLSearchParams(location.search);
-    const initializationIdFromParams = searchParams.get('initialization_id');
-    console.log('initialization ID from URL:', initializationIdFromParams);
-    
-    if (initializationIdFromParams) {
-      setinitializationId(initializationIdFromParams);
+ 
+useEffect(() => {
+  // Extract initiation_id and price from URL params
+  const searchParams = new URLSearchParams(location.search);
+  const initializationIdFromParams = searchParams.get('initialization_id');
+  const priceFromParams = searchParams.get('price'); // Extract price from URL params
+  console.log('initialization ID from URL:', initializationIdFromParams);
+  console.log('Price from URL:', priceFromParams);
+
+  if (initializationIdFromParams) {
+    setInitializationId(initializationIdFromParams);
+    // Set the price from URL params to state
+    if (priceFromParams) {
+      setPrice(parseFloat(priceFromParams)); // Convert to a number if needed
     }
-  }, [location.search]);
+  }
+}, [location.search]);
   
 
   const handleEmailChange = (event) => {
@@ -27,11 +34,10 @@ const LoginForm = () => {
     setPassword(event.target.value);
   };
 
-  const handleFormSubmit = async (event) => {
-    event.preventDefault();
-    console.log('Initialization ID:', initializationId);
-  
+  const handleConfirmationSubmit = async () => {
+    setShowConfirmation(false); // Hide confirmation dialog
     try {
+      // Proceed with the POST request after confirmation
       const response = await fetch('https://100088.pythonanywhere.com/api/wallet/v1/verify-payment', {
         method: 'POST',
         headers: {
@@ -43,16 +49,16 @@ const LoginForm = () => {
           initialization_id: initializationId,
         }),
       });
-  
+
       if (!response.ok) {
-        const errorData = await response.json(); // Attempt to parse error response
+        const errorData = await response.json();
         console.error('Login failed:', errorData.error || 'Unknown error');
-        return; // Exit function early if there's an error
+        return;
       }
-  
+
       const data = await response.json();
       console.log('Login response:', data);
-  
+
       if (data.redirect_url) {
         window.location.href = data.redirect_url;
       } else {
@@ -62,6 +68,12 @@ const LoginForm = () => {
       console.error('Login error:', error);
     }
   };
+
+  const handleFormSubmit = async (event) => {
+    event.preventDefault();
+    setShowConfirmation(true); // Show confirmation dialog
+  };
+
   
 
   return (
@@ -112,10 +124,18 @@ const LoginForm = () => {
             cursor: 'pointer',
           }}
         >
-          Login
+          Authorize Payment
         </button>
       </form>
+      {showConfirmation && (
+        <div className="confirmation-dialog">
+          <p>Confirm payment of ${price}?</p>
+          <button onClick={handleConfirmationSubmit}>Confirm</button>
+          <button onClick={() => setShowConfirmation(false)}>Cancel</button>
+        </div>
+      )}
     </div>
+    
   );
 };
 
