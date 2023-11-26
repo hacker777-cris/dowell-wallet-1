@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate,  useParams } from 'react-router-dom';
 import { TokenManager } from './Tokenmanager'; 
+import { useLocation } from 'react-router-dom'; // Assuming React Router is used
+
 
 const containerStyle = {
   maxWidth: '800px',
@@ -49,7 +51,18 @@ const buttonStyle = {
 const DepositPage = () => {
   const [amount, setAmount] = useState('');
   const [message, setMessage] = useState('');
-  const navigate = useNavigate(); // Get the navigate function
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [depositmethod, setDepositMethod] = useState('');
+
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    const method = searchParams.get('method'); // Extract method from URL params
+
+    if (method) {
+      setDepositMethod(method);
+    }
+  }, [location.search]);
 
   const handleDeposit = () => {
     // Check if the amount is valid (you can add more validation here)
@@ -58,7 +71,8 @@ const DepositPage = () => {
       return;
     }
 
-    const apiUrl = 'https://100088.pythonanywhere.com/api/wallet/v1/stripe-payment';
+    const stripeapiUrl = 'https://100088.pythonanywhere.com/api/wallet/v1/stripe-payment';
+    const paypalapiUrl = 'https://100088.pythonanywhere.com/api/wallet/v1/paypal-payment'; // Replace with your PayPal API URL
     const storedAccessToken = TokenManager.getToken();
 
     if (!storedAccessToken) {
@@ -66,6 +80,8 @@ const DepositPage = () => {
       navigate('/login'); // Redirect to the login page
       return;
     }
+
+    const apiUrl = depositmethod === 'paypal' ? paypalapiUrl : stripeapiUrl; // Select API URL based on deposit method
 
     fetch(apiUrl, {
       method: 'POST',
@@ -96,7 +112,7 @@ const DepositPage = () => {
         <img src="paypal_logo.png" alt="Dowell wallet" style={logoStyle} />
       </header>
       <div style={formContainerStyle}>
-        <h2>Deposit Money</h2>
+      <h2>Deposit Money via {depositmethod && depositmethod.toUpperCase()}</h2>
         {message && <p style={{ color: 'red' }}>{message}</p>}
         <input
           style={inputStyle}

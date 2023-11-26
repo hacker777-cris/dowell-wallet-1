@@ -125,6 +125,7 @@ const HomePage = () => {
   const navigate = useNavigate();
 
   const [isLoadingTopUp, setIsLoadingTopUp] = useState(false);
+  const [showPaymentOptions, setShowPaymentOptions] = useState(false);
   const [walletData, setWalletData] = useState({ wallet: { balance: '0.00' }, transactions: [] });
 
   useEffect(() => {
@@ -164,9 +165,14 @@ const HomePage = () => {
     setIsLoadingTopUp(true);
 
     setTimeout(() => {
-      navigate('/deposit');
+      setShowPaymentOptions(true); // Display payment options when "Top Up" is clicked
       setIsLoadingTopUp(false);
     }, 1000);
+  };
+
+  const handlePaymentMethod = (method) => {
+    navigate(`/deposit?method=${method}`); // Navigate to /deposit with the chosen payment method
+    setShowPaymentOptions(false); // Hide payment options after selecting a method
   };
 
   return (
@@ -236,6 +242,13 @@ const HomePage = () => {
           </tbody>
         </table>
       </div>
+      {showPaymentOptions && (
+        <div style={{ position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', backgroundColor: 'white', padding: '20px', boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)', borderRadius: '8px', zIndex: '999', textAlign: 'center' }}>
+          <h2>Choose Payment Method</h2>
+          <button onClick={() => handlePaymentMethod('paypal')} style={{ marginRight: '10px' }}>PayPal</button>
+          <button onClick={() => handlePaymentMethod('stripe')} style={{ marginRight: '10px' }}>Stripe</button>
+        </div>
+      )}
     </div>
   );
 };
