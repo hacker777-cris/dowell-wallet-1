@@ -8,10 +8,11 @@ export const useUser = () => {
 
 export const UserProvider = ({ children }) => {
   const [accessToken, setAccessToken] = useState(null);
+  const [sessionId, setSessionId] = useState(null);
   const [email, setEmail] = useState(''); // Add the email state
 
   return (
-    <UserContext.Provider value={{ accessToken, setAccessToken, email, setEmail }}> {/* Include email and setEmail */}
+    <UserContext.Provider value={{ accessToken, setAccessToken, email, setEmail,sessionId, setSessionId }}> {/* Include email and setEmail */}
       {children}
     </UserContext.Provider>
   );

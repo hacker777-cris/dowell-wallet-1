@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate,useLocation } from 'react-router-dom';
 import { useUser } from '../UserContext';
 import { TokenManager } from './Tokenmanager'; // Import the TokenManager
 import Loader from './Loader'; // Import the Loader component
@@ -121,30 +121,26 @@ const tableCellStyle = {
 };
 
 const HomePage = () => {
-  const { setAccessToken } = useUser();
+  const { setSessionId } = useUser();
   const navigate = useNavigate();
+  const location = useLocation(); // Use useLocation hook to access location
 
   const [isLoadingTopUp, setIsLoadingTopUp] = useState(false);
   const [showPaymentOptions, setShowPaymentOptions] = useState(false);
   const [walletData, setWalletData] = useState({ wallet: { balance: '0.00' }, transactions: [] });
 
   useEffect(() => {
-    // Retrieve the access token from the TokenManager
-    const storedAccessToken = TokenManager.getToken();
+    const urlSearchParams = new URLSearchParams(location.search);
+    const sessionId = urlSearchParams.get('session_id');
 
-    if (!storedAccessToken) {
-      navigate('/login');
-      return;
-    }
-
-    setAccessToken(storedAccessToken);
+    setSessionId(sessionId);
 
     const apiUrl = 'https://100088.pythonanywhere.com/api/wallet/v1/wallet_detail';
 
     fetch(apiUrl, {
       method: 'GET',
       headers: {
-        Authorization: `Bearer ${storedAccessToken}`,
+        'session_id': sessionId,
       },
     })
       .then((response) => response.json())
@@ -154,7 +150,7 @@ const HomePage = () => {
       .catch((error) => {
         console.error('Error fetching data:', error);
       });
-  }, [navigate]);
+  }, [location.search, setSessionId]);
 
   const handleLogout = () => {
     localStorage.removeItem('accessToken');
