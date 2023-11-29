@@ -132,17 +132,12 @@ const HomePage = () => {
   useEffect(() => {
     const urlSearchParams = new URLSearchParams(location.search);
     const sessionId = urlSearchParams.get('session_id');
-
+  
     setSessionId(sessionId);
-
-    const apiUrl = 'https://100088.pythonanywhere.com/api/wallet/v1/wallet_detail';
-
-    fetch(apiUrl, {
-      method: 'GET',
-      headers: {
-        'session_id': sessionId,
-      },
-    })
+  
+    const apiUrl = `https://100088.pythonanywhere.com/api/wallet/v1/wallet_detail?session_id=${sessionId}`;
+  
+    fetch(apiUrl)
       .then((response) => response.json())
       .then((data) => {
         setWalletData(data);
@@ -151,6 +146,7 @@ const HomePage = () => {
         console.error('Error fetching data:', error);
       });
   }, [location.search, setSessionId]);
+  
 
   const handleLogout = () => {
     localStorage.removeItem('accessToken');
