@@ -138,14 +138,22 @@ const HomePage = () => {
     const apiUrl = `https://100088.pythonanywhere.com/api/wallet/v1/wallet_detail?session_id=${sessionId}`;
   
     fetch(apiUrl)
-      .then((response) => response.json())
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok.');
+        }
+        return response.json();
+      })
       .then((data) => {
+        console.log('API Response:', data);
         setWalletData(data);
       })
       .catch((error) => {
+        // Handle non-JSON responses or network errors here
         console.error('Error fetching data:', error);
       });
   }, [location.search, setSessionId]);
+  
   
 
   const handleLogout = () => {
