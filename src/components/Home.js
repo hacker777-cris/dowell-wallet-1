@@ -128,19 +128,24 @@ const HomePage = () => {
   const [isLoadingTopUp, setIsLoadingTopUp] = useState(false);
   const [showPaymentOptions, setShowPaymentOptions] = useState(false);
   const [walletData, setWalletData] = useState({ wallet: { balance: '0.00' }, transactions: [] });
-  const [htmlContent, setHtmlContent] = useState('');
 
   useEffect(() => {
     const urlSearchParams = new URLSearchParams(location.search);
     const sessionId = urlSearchParams.get('session_id');
-  
+
     setSessionId(sessionId);
-    console.log(sessionId)
-  
-    const apiUrl = `https://100088.pythonanywhere.com/api/wallet/v1/wallet-dashboard?session_id=${sessionId}`;
-  
+    console.log(sessionId);
+
+    const apiUrl = `https://100088.pythonanywhere.com/api/wallet/v1/wallet_detail?session_id=${sessionId}`;
+
     fetch(apiUrl)
       .then((response) => {
+        if (response.redirected) {
+          // If redirected, update the window location
+          window.location.href = response.url;
+          return; // Stop further processing as the redirection will change the page
+        }
+
         if (!response.ok) {
           throw new Error('Network response was not ok.');
         }
