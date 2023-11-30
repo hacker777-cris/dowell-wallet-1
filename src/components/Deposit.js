@@ -54,13 +54,20 @@ const DepositPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [depositmethod, setDepositMethod] = useState('');
+  const[sessionId, setSessionId] = useState('');
 
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
     const method = searchParams.get('method'); // Extract method from URL params
+    // Extract the session ID from the URL parameters
+    const urlSearchParams = new URLSearchParams(location.search);
+    const sessionId = urlSearchParams.get('session_id');
 
     if (method) {
       setDepositMethod(method);
+    }
+    if (sessionId) {
+      setSessionId(sessionId);
     }
   }, [location.search]);
 
@@ -71,39 +78,31 @@ const DepositPage = () => {
       return;
     }
 
-    const stripeapiUrl = 'https://100088.pythonanywhere.com/api/wallet/v1/stripe-payment';
-    const paypalapiUrl = 'https://100088.pythonanywhere.com/api/wallet/v1/paypal-payment'; // Replace with your PayPal API URL
-    const storedAccessToken = TokenManager.getToken();
+    const stripeapiUrl = `https://100088.pythonanywhere.com/api/wallet/v1/stripe-payment?session_id=${sessionId}`;
+  const paypalapiUrl = `https://100088.pythonanywhere.com/api/wallet/v1/paypal-payment?session_id=${sessionId}`;
 
-    if (!storedAccessToken) {
-      // Handle the case where the access token is not available
-      navigate('/login'); // Redirect to the login page
-      return;
-    }
+  const apiUrl = depositmethod === 'paypal' ? paypalapiUrl : stripeapiUrl; // Select API URL based on deposit method
 
-    const apiUrl = depositmethod === 'paypal' ? paypalapiUrl : stripeapiUrl; // Select API URL based on deposit method
+  fetch(apiUrl, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ amount: parseFloat(amount) }),
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      setMessage(data.message);
 
-    fetch(apiUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${storedAccessToken}`,
-      },
-      body: JSON.stringify({ amount: parseFloat(amount) }),
+      if (data.success) {
+        window.location.href = data.approval_url;
+      }
     })
-      .then((response) => response.json())
-      .then((data) => {
-        setMessage(data.message);
-
-        if (data.success) {
-          window.location.href = data.approval_url;
-        }
-      })
-      .catch((error) => {
-        console.error('Error making a deposit:', error);
-        setMessage('An error occurred. Please try again.');
-      });
-  };
+    .catch((error) => {
+      console.error('Error making a deposit:', error);
+      setMessage('An error occurred. Please try again.');
+    });
+};
 
 
   return (
