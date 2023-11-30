@@ -123,7 +123,7 @@ const ProfilePage = () => {
         </Link>
       </header>
       <div style={profileContainerStyle}>
-        <img src={`http://127.0.0.1:8000${profileData.profile_picture}`} alt="Profile" style={imgStyle} />
+        <img src={profileData.profile_picture} alt="Profile" style={imgStyle} />
         <h2 style={titleStyle}>Profile Details</h2>
         {error && <div style={errorStyle}>{error}</div>}
         <div style={detailStyle}>

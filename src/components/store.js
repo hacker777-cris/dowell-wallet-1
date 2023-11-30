@@ -28,7 +28,7 @@ const Store = () => {
     const currentUrl = window.location.href;
 
     try {
-      const response = await fetch('https://100088.pythonanywhere.com/api/wallet/v1/initialize-payment', {
+      const response = await fetch('http://127.0.0.1:8000/api/wallet/v1/initialize-payment', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

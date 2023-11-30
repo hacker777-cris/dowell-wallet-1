@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { TokenManager } from './Tokenmanager'; // Import the TokenManager
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { TokenManager } from './Tokenmanager';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 
 const containerStyle = {
   maxWidth: '800px',
@@ -45,117 +45,71 @@ const checkboxStyle = {
   fontSize: '18px',
 };
 
+
 const SettingsPage = () => {
-  const [deleteAccount, setDeleteAccount] = useState(false);
-  const [disableAccount, setDisableAccount] = useState(false);
-  const [showOTPSection, setShowOTPSection] = useState(false);
-  const [otp, setOTP] = useState('');
-  const [error, setError] = useState(''); // State to store error messages
-  const navigate = useNavigate();
+  const [sessionId, setSessionId] = useState('');
+  const [message, setMessage] = useState('');
+  const [error, setError] = useState('');
+  const location = useLocation();
+  const navigate = useNavigate(); // Import useNavigate hook
 
-  const handleDeleteAccount = () => {
-    // Implement account deletion logic here
-  };
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    const sessionIdFromParams = searchParams.get('session_id');
+    setSessionId(sessionIdFromParams);
+  }, [location.search]);
 
-  const handleDisableAccount = () => {
-    const storedAccessToken = TokenManager.getToken();
-
-    if (!storedAccessToken) {
-      navigate('/login');
+  const handleGetTransactionHistory = () => {
+    if (!sessionId) {
+      setError('Session ID not found.');
       return;
     }
 
-    fetch('https://100088.pythonanywhere.com/api/wallet/v1/request-disable', {
-      method: 'POST',
+    fetch(`http://127.0.0.1:8000/api/wallet/v1/transactions-history/?session_id=${sessionId}`, {
+      method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${storedAccessToken}`,
       },
     })
       .then((response) => {
         if (response.status === 200) {
-          setShowOTPSection(true);
+          return response.json(); // Parse the response body as JSON
         } else {
           response.json().then((data) => {
-            setError(data.message || 'Account disabling request failed. Please try again.');
+            setError(data.message || 'Failed to fetch transaction history.');
           });
         }
       })
-      .catch((error) => {
-        console.error('Error sending account disabling request:', error);
-        setError('An error occurred while sending the request.');
-      });
-  };
+      .then((data) => {
+        if (data) {
+          setMessage(data.message);
 
-  const handleVerifyOTP = () => {
-    // Implement OTP verification logic here
-    // After OTP verification, you can navigate the user or perform any other actions
-    // For example, navigate to a success page or perform account disabling
+          // Add a delay before redirecting
+          setTimeout(() => {
+            navigate(`/?session_id=${sessionId}`);
+          }, 3000); // Redirect after 3 seconds (3000 milliseconds)
+        }
+      })
+      .catch((error) => {
+        console.error('Error fetching transaction history:', error);
+        setError('An error occurred while fetching transaction history.');
+      });
   };
 
   return (
     <div style={containerStyle}>
-      <header style={headerStyle}>
-        <h1>Account Settings</h1>
-        <Link to="/">Home</Link>
-      </header>
+      {/* ... (existing code) */}
 
       <div style={sectionStyle}>
-        <h2 style={{ fontSize: '24px', marginBottom: '20px' }}>Disable Account</h2>
-        <p style={{ fontSize: '18px', marginBottom: '20px' }}>
-          By disabling your account, your account will be temporarily suspended and not accessible by you or others.
-          This action can be reversed by re-enabling the account.
-        </p>
-        <label style={checkboxLabelStyle}>
-          <input
-            type="checkbox"
-            checked={disableAccount}
-            onChange={() => setDisableAccount(!disableAccount)}
-            style={checkboxStyle}
-          />
-          I understand and want to disable my account
-        </label>
-        <button style={buttonStyle} onClick={handleDisableAccount}>
-          Disable Account
+        <h2 style={{ fontSize: '24px', marginBottom: '20px' }}>Get Transaction History</h2>
+        <button style={buttonStyle} onClick={handleGetTransactionHistory}>
+          Get Transaction History
         </button>
+        {message && <div style={{ color: 'green' }}>{message}</div>}
+        {error && <div style={{ color: 'red' }}>{error}</div>}
       </div>
 
-      {showOTPSection && (
-        <div style={sectionStyle}>
-          <h2 style={{ fontSize: '24px', marginBottom: '20px' }}>OTP Verification</h2>
-          <p style={{ fontSize: '18px', marginBottom: '20px' }}>
-            Enter the OTP sent to your email or phone number.
-          </p>
-          {error && <div style={{ color: 'red' }}>{error}</div>}
-          <input
-            type="text"
-            placeholder="Enter OTP"
-            value={otp}
-            onChange={(e) => setOTP(e.target.value)}
-          />
-          <button onClick={handleVerifyOTP}>Verify OTP</button>
-        </div>
-      )}
-
-      <div style={sectionStyle}>
-        <h2 style={{ fontSize: '24px', marginBottom: '20px' }}>Delete Account</h2>
-        <p style={{ fontSize: '18px', marginBottom: '20px' }}>
-          By deleting your account, all your data will be permanently removed from our system.
-          This action cannot be undone.
-        </p>
-        <label style={checkboxLabelStyle}>
-          <input
-            type="checkbox"
-            checked={deleteAccount}
-            onChange={() => setDeleteAccount(!deleteAccount)}
-            style={checkboxStyle}
-          />
-          I understand and want to delete my account
-        </label>
-        <button style={buttonStyle} onClick={handleDeleteAccount}>
-          Delete Account
-        </button>
-      </div>
+      {/* ... (existing code) */}
     </div>
   );
 };

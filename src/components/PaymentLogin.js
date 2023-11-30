@@ -44,14 +44,13 @@ useEffect(() => {
     setShowConfirmation(false); // Hide confirmation dialog
     try {
       // Proceed with the POST request after confirmation
-      const response = await fetch('https://100088.pythonanywhere.com/api/wallet/v1/verify-payment', {
+      const response = await fetch('http://127.0.0.1:8000//api/wallet/v1/authorize-payment', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          email,
-          password,
+          wallet_password: password,
           initialization_id: initializationId,
         }),
       });
@@ -96,7 +95,7 @@ useEffect(() => {
           margin: '0 auto',
         }}
       >
-        <input
+        {/* <input
           type="email"
           placeholder="Email"
           value={email}
@@ -107,7 +106,7 @@ useEffect(() => {
             borderRadius: '5px',
             border: '1px solid #ccc',
           }}
-        />
+        /> */}
         <input
           type="password"
           placeholder="Password"

@@ -215,7 +215,7 @@ const HomePage = () => {
             </Link>
           </div>
           <div>
-            <Link to="/settings" style={navItemStyle}>
+          <Link to={`/settings?session_id=${sessionId}`} style={navItemStyle}>
               Settings
             </Link>
             </div>
