@@ -141,7 +141,7 @@ const HomePage = () => {
     setSessionId(sessionId);
     console.log(sessionId);
 
-    const apiUrl = `http://127.0.0.1:8000/api/wallet/v1/wallet_detail?session_id=${sessionId}`;
+    const apiUrl = `http://127.0.0.1:8000/api/wallet/v1/wallet_detail/?session_id=${sessionId}`;
 
     fetch(apiUrl)
       .then((response) => {
@@ -265,7 +265,7 @@ const HomePage = () => {
     <tbody>
       {walletData.transactions.map((transaction, index) => (
         <tr key={index}>
-          <td style={tableCellStyle}>{transaction.timestamp}</td>
+          <td style={tableCellStyle}>{transaction.date}</td>
           <td style={tableCellStyle}>{transaction.transaction_type}</td>
           <td style={tableCellStyle}>{transaction.amount}</td>
         </tr>
