@@ -127,7 +127,11 @@ const HomePage = () => {
 
   const [isLoadingTopUp, setIsLoadingTopUp] = useState(false);
   const [showPaymentOptions, setShowPaymentOptions] = useState(false);
-  const [walletData, setWalletData] = useState({ wallet: { balance: '0.00' }, transactions: [] });
+  const [walletData, setWalletData] = useState({
+    wallet: { account_no: '', balance: '0.00' },
+    transactions: [],
+  });
+  
 
   useEffect(() => {
     const urlSearchParams = new URLSearchParams(location.search);
@@ -153,10 +157,17 @@ const HomePage = () => {
       })
       .then((data) => {
         console.log('API Response:', data);
-        setWalletData(data);
+    
+        // Assuming wallet is an array with potentially multiple wallet objects
+        if (data.wallet && data.wallet.length > 0) {
+          setWalletData(data);
+        } else {
+          // Handle case when wallet data is empty or not in the expected format
+          console.error('Empty or unexpected wallet data received');
+        }
       })
       .catch((error) => {
-        // Handle non-JSON responses or network errors here
+        // Handle errors
         console.error('Error fetching data:', error);
       });
   }, [location.search, setSessionId]);
@@ -209,13 +220,15 @@ const HomePage = () => {
           </div>
         </div>
       </header>
+      {walletData.wallet.length > 0 && (
       <div style={accountNumberContainerStyle}>
         <span style={accountNumberStyle}>
-          Account: {walletData.wallet.account_no}
+          Account: {walletData.wallet[0].account_no}
         </span>
       </div>
+    )}
       <div style={walletBalanceContainerStyle}>
-        <div style={walletBalanceStyle}>${walletData.wallet.balance}</div>
+  <div style={walletBalanceStyle}>${walletData.wallet.length > 0 ? walletData.wallet[0].balance : '0.00'}</div>
         <div style={buttonContainerStyle}>
           {isLoadingTopUp ? (
             <Loader />
@@ -230,25 +243,26 @@ const HomePage = () => {
         </div>
       </div>
       <div style={recentTransactionsStyle}>
-        <table style={transactionTableStyle}>
-          <thead style={tableHeaderStyle}>
-            <tr>
-              <th style={tableCellStyle}>Date</th>
-              <th style={tableCellStyle}>Description</th>
-              <th style={tableCellStyle}>Amount</th>
-            </tr>
-          </thead>
-          <tbody>
-            {walletData.transactions.map((transaction, index) => (
-              <tr key={index}>
-                <td style={tableCellStyle}>{transaction.timestamp}</td>
-                <td style={tableCellStyle}>{transaction.transaction_type}</td>
-                <td style={tableCellStyle}>{transaction.amount}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+  <table style={transactionTableStyle}>
+    <thead style={tableHeaderStyle}>
+      <tr>
+        <th style={tableCellStyle}>Date</th>
+        <th style={tableCellStyle}>Description</th>
+        <th style={tableCellStyle}>Amount</th>
+      </tr>
+    </thead>
+    <tbody>
+      {walletData.transactions.map((transaction, index) => (
+        <tr key={index}>
+          <td style={tableCellStyle}>{transaction.timestamp}</td>
+          <td style={tableCellStyle}>{transaction.transaction_type}</td>
+          <td style={tableCellStyle}>{transaction.amount}</td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>
+
       {showPaymentOptions && (
         <div style={{ position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', backgroundColor: 'white', padding: '20px', boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)', borderRadius: '8px', zIndex: '999', textAlign: 'center' }}>
           <h2>Choose Payment Method</h2>
