@@ -78,8 +78,8 @@ const DepositPage = () => {
       return;
     }
 
-    const stripeapiUrl = `https://100088.pythonanywhere.com/api/wallet/v1/stripe-payment?session_id=${sessionId}`;
-  const paypalapiUrl = `https://100088.pythonanywhere.com/api/wallet/v1/paypal-payment?session_id=${sessionId}`;
+    const stripeapiUrl = `http://127.0.0.1:8000/api/wallet/v1/stripe-payment?session_id=${sessionId}`;
+  const paypalapiUrl = `http://127.0.0.1:8000/api/wallet/v1/paypal-payment?session_id=${sessionId}`;
 
   const apiUrl = depositmethod === 'paypal' ? paypalapiUrl : stripeapiUrl; // Select API URL based on deposit method
 

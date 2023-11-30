@@ -140,7 +140,7 @@ const HomePage = () => {
     setSessionId(sessionId);
     console.log(sessionId);
 
-    const apiUrl = `https://100088.pythonanywhere.com/api/wallet/v1/wallet_detail?session_id=${sessionId}`;
+    const apiUrl = `http://127.0.0.1:8000/api/wallet/v1/wallet_detail?session_id=${sessionId}`;
 
     fetch(apiUrl)
       .then((response) => {
