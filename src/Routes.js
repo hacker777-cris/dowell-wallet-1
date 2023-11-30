@@ -12,6 +12,7 @@ import Settings from './components/Settings';
 import DowellPay from './components/store';
 import Otpverification from './components/Otpverification';
 import PasswordResetPage from './components/PasswordReset';
+import WalletPassword from './components/WalletPassword';
 
 function AppRoutes() {
   return (
@@ -27,6 +28,7 @@ function AppRoutes() {
       <Route path="settings" element={<Settings />} />
       <Route path="update-profile" element={<UpdateProfile />} />
       <Route path="deposit" element={<Deposit />} />
+      <Route path="wallet-password" element={<WalletPassword />} />
     </Routes>
   );
 }

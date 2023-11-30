@@ -122,6 +122,7 @@ const tableCellStyle = {
 
 const HomePage = () => {
   const { setSessionId } = useUser();
+  const { sessionId } = useUser(); // Assuming sessionId is set using useEffect
   const navigate = useNavigate();
   const location = useLocation(); // Use useLocation hook to access location
 
@@ -189,9 +190,19 @@ const HomePage = () => {
   };
 
   const handlePaymentMethod = (method) => {
-    navigate(`/deposit?method=${method}`); // Navigate to /deposit with the chosen payment method
-    setShowPaymentOptions(false); // Hide payment options after selecting a method
+    const urlSearchParams = new URLSearchParams(location.search);
+    const sessionId = urlSearchParams.get('session_id');
+  
+    if (sessionId) {
+      navigate(`/deposit?method=${method}&session_id=${sessionId}`);
+      setShowPaymentOptions(false); // Hide payment options after selecting a method
+    } else {
+      // Handle the case where sessionId is not found in the URL params
+      console.error('Session ID not found in URL parameters');
+    }
   };
+  
+  
 
   return (
     <div style={containerStyle}>
@@ -199,7 +210,7 @@ const HomePage = () => {
         <img src={logoImage} alt="Dowell wallet" style={logoStyle} />
         <div style={navBarStyle}>
           <div>
-            <Link to="/profile" style={navItemStyle}>
+          <Link to={`/profile?session_id=${sessionId}`} style={navItemStyle}>
               Profile
             </Link>
           </div>
@@ -213,11 +224,11 @@ const HomePage = () => {
               Requests
             </Link>
             </div> */}
-          <div>
+          {/* <div>
             <span style={navItemStyle} onClick={handleLogout}>
               Logout
             </span>
-          </div>
+          </div> */}
         </div>
       </header>
       {walletData.wallet.length > 0 && (

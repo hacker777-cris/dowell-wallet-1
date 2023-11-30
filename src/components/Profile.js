@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate,useLocation } from 'react-router-dom';
 import { useUser } from '../UserContext';
-import { TokenManager } from './Tokenmanager';
 
 const containerStyle = {
   maxWidth: '800px',
@@ -71,41 +70,42 @@ const detailStyle = {
 };
 
 const ProfilePage = () => {
-  const { setAccessToken } = useUser();
-  const navigate = useNavigate();
+  const { setSessionId } = useUser();
+  const location = useLocation();
 
   const [profileData, setProfileData] = useState({});
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const storedAccessToken = TokenManager.getToken(); // Retrieve the access token using TokenManager
+    const urlSearchParams = new URLSearchParams(location.search);
+    const sessionId = urlSearchParams.get('session_id');
 
-    if (!storedAccessToken) {
-      navigate('/login');
-      return;
-    }
+    setSessionId(sessionId);
+    console.log(sessionId);
 
-    fetch('https://100088.pythonanywhere.com/api/wallet/v1/profile', {
-      method: 'GET',
-      headers: {
-        Authorization: `Bearer ${storedAccessToken}`,
-      },
-    })
+    const apiUrl = `http://127.0.0.1:8000/api/wallet/v1/profile?session_id=${sessionId}`;
+
+    fetch(apiUrl)
       .then((response) => {
-        if (response.ok) {
-          return response.json();
-        } else {
-          throw new Error(`Failed to retrieve profile data. Status: ${response.status}`);
+        if (response.redirected) {
+          window.location.href = response.url;
+          return;
         }
+
+        if (!response.ok) {
+          throw new Error('Network response was not ok.');
+        }
+        return response.json();
       })
       .then((data) => {
         setProfileData(data.data);
+        console.log(profileData)
       })
       .catch((error) => {
         console.error('Error fetching profile data:', error);
         setError('An error occurred while fetching profile data.');
       });
-  }, [navigate]);
+  }, [location.search, setSessionId]);
 
   return (
     <div style={containerStyle}>
@@ -114,16 +114,16 @@ const ProfilePage = () => {
           <Link to="/" style={navLinkStyle}>
             Home
           </Link>
-          <Link to="/update-profile" style={navLinkStyle}>
+          {/* <Link to="/update-profile" style={navLinkStyle}>
             Update Profile
-          </Link>
+          </Link> */}
         </div>
         <Link to="/logout">
           <button style={buttonStyle}>Logout</button>
         </Link>
       </header>
       <div style={profileContainerStyle}>
-        <img src={`https://100088.pythonanywhere.com${profileData.profile_picture}`} alt="Profile" style={imgStyle} />
+        <img src={`http://127.0.0.1:8000${profileData.profile_picture}`} alt="Profile" style={imgStyle} />
         <h2 style={titleStyle}>Profile Details</h2>
         {error && <div style={errorStyle}>{error}</div>}
         <div style={detailStyle}>
