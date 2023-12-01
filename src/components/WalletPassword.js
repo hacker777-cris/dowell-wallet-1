@@ -22,7 +22,7 @@ const WalletPassword = () => {
 
   const handleSubmit = () => {
     if (password.length === 4) {
-      const apiUrl = `https://100088.pythonanywhere.com/api/wallet/v1/wallet-password?session_id=${sessionId}`;
+      const apiUrl = `https://100088.pythonanywhere.com/api/wallet/v1/wallet-password/?session_id=${sessionId}`;
       console.log(apiUrl)
       fetch(apiUrl, {
         method: 'POST',
@@ -31,10 +31,21 @@ const WalletPassword = () => {
         },
         body: JSON.stringify({ wallet_password: password }),
       })
-        .then((response) => {
-          if (response.redirected) {
-            window.location.href = response.url;
-          }
+      .then((response) => {
+        console.log(response)
+        if (response.redirected) {
+          // If redirected, update the window location
+          window.location.href = response.url;
+          return;
+        }
+
+        if (!response.ok) {
+          throw new Error('Network response was not ok.');
+        }
+        return response.json();
+      })
+      .then((data) => {
+        console.log('API Response:', data);
         })
         .catch((error) => {
           console.error('Error setting password:', error);
