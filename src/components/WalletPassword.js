@@ -22,7 +22,7 @@ const WalletPassword = () => {
 
   const handleSubmit = () => {
     if (password.length === 4) {
-      const apiUrl = `https://100088.pythonanywhere.com/api/wallet/v1/wallet-password/?session_id=${sessionId}`;
+      const apiUrl = `https://100088.pythonanywhere.com/api/wallet/v1/wallet-password?session_id=${sessionId}`;
       console.log(apiUrl)
       fetch(apiUrl, {
         method: 'POST',
