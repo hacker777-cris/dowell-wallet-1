@@ -5,6 +5,7 @@ const WalletPassword = () => {
   const location = useLocation();
   const urlSearchParams = new URLSearchParams(location.search);
   const sessionId = urlSearchParams.get('session_id');
+  console.log(sessionId)
 
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
@@ -21,7 +22,8 @@ const WalletPassword = () => {
 
   const handleSubmit = () => {
     if (password.length === 4) {
-      const apiUrl = `https://100088.pythonanywhere.com/api/wallet/v1/wallet-password/?session_id=9hck8ba8ds6ed1yt6uhzlkrnencpsqwf`;
+      const apiUrl = `https://100088.pythonanywhere.com/api/wallet/v1/wallet-password?session_id=${sessionId}`;
+      console.log(apiUrl)
       fetch(apiUrl, {
         method: 'POST',
         headers: {
