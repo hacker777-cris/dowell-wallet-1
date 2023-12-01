@@ -139,7 +139,7 @@ const ProfilePage = () => {
           <strong>Address:</strong> {profileData.address}
         </div>
         <div style={detailStyle}>
-          <strong>Phone Number:</strong> {profileData.phone_number}
+          <strong>Phone Number:</strong> {profileData.phone}
         </div>
         <div style={detailStyle}>
           <strong>Wallet Account Number:</strong> {profileData.account_no}
