@@ -62,6 +62,7 @@ const DepositPage = () => {
     // Extract the session ID from the URL parameters
     const urlSearchParams = new URLSearchParams(location.search);
     const sessionId = urlSearchParams.get('session_id');
+    
 
     if (method) {
       setDepositMethod(method);
@@ -78,14 +79,21 @@ const DepositPage = () => {
       return;
     }
 
-    const stripeapiUrl = `http://127.0.0.1:8000/api/wallet/v1/stripe-payment?session_id=${sessionId}`;
+  const stripeapiUrl = `http://127.0.0.1:8000/api/wallet/v1/stripe-payment?session_id=${sessionId}`;
   const paypalapiUrl = `https://100088.pythonanywhere.com/api/wallet/v1/paypal-payment?session_id=${sessionId}`;
+  const accessToken = TokenManager.getToken(); // Replace this with the actual method in TokenManager
+
+    if (!accessToken) {
+      navigate(`/login?session_id=${sessionId}`);
+      return; // Stop further execution of useEffect
+    }
 
   const apiUrl = depositmethod === 'paypal' ? paypalapiUrl : stripeapiUrl; // Select API URL based on deposit method
 
   fetch(apiUrl, {
     method: 'POST',
     headers: {
+      Authorization: `Bearer ${accessToken}`,
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({ amount: parseFloat(amount) }),

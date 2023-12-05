@@ -137,13 +137,27 @@ const HomePage = () => {
   useEffect(() => {
     const urlSearchParams = new URLSearchParams(location.search);
     const sessionId = urlSearchParams.get('session_id');
+    // Get the access token from TokenManager
+    const accessToken = TokenManager.getToken(); // Replace this with the actual method in TokenManager
+    // Check if access token is null, then navigate to login
+    if (!accessToken) {
+      navigate(`/login?session_id=${sessionId}`);
+      return; // Stop further execution of useEffect
+    }
+    console.log(accessToken)
 
     setSessionId(sessionId);
     console.log(sessionId);
 
     const apiUrl = `http://127.0.0.1:8000/api/wallet/v1/wallet_detail/?session_id=${sessionId}`;
+    const requestOptions = {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+      },
+    };
 
-    fetch(apiUrl)
+    fetch(apiUrl,requestOptions)
       .then((response) => {
         if (response.redirected) {
           // If redirected, update the window location

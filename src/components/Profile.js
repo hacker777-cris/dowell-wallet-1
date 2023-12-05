@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate,useLocation } from 'react-router-dom';
+import { TokenManager } from './Tokenmanager'; // Import the TokenManager
 import { useUser } from '../UserContext';
 
 const containerStyle = {
@@ -72,6 +73,7 @@ const detailStyle = {
 const ProfilePage = () => {
   const { setSessionId } = useUser();
   const location = useLocation();
+  const navigate = useNavigate();
 
   const [profileData, setProfileData] = useState({});
   const [error, setError] = useState(null);
@@ -79,13 +81,25 @@ const ProfilePage = () => {
   useEffect(() => {
     const urlSearchParams = new URLSearchParams(location.search);
     const sessionId = urlSearchParams.get('session_id');
+    const accessToken = TokenManager.getToken(); // Replace this with the actual method in TokenManager
+    if (!accessToken) {
+      navigate(`/login?session_id=${sessionId}`);
+      return; // Stop further execution of useEffect
+    }
+    console.log(accessToken)
 
     setSessionId(sessionId);
     console.log(sessionId);
+    const requestOptions = {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+      },
+    };
 
     const apiUrl = `http://127.0.0.1:8000/api/wallet/v1/profile?session_id=${sessionId}`;
 
-    fetch(apiUrl)
+    fetch(apiUrl,requestOptions)
       .then((response) => {
         if (response.redirected) {
           window.location.href = response.url;

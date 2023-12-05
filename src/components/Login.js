@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate,useLocation} from 'react-router-dom';
 import { useUser } from '../UserContext';
 import { TokenManager } from './Tokenmanager';
 
@@ -64,15 +64,18 @@ const LoginPage = () => {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false); // State to toggle password visibility
   const [error, setError] = useState('');
+  const location = useLocation(); // Use useLocation hook to access location
   const navigate = useNavigate();
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    const urlSearchParams = new URLSearchParams(location.search);
+    const sessionId = urlSearchParams.get('session_id');
+    console.log(sessionId)
 
-    const apiUrl = 'https://100088.pythonanywhere.com/api/wallet/v1/login';
+    const apiUrl = `http://127.0.0.1:8000/api/wallet/v1/wallet-login?session_id=${sessionId}`;
     const requestBody = {
-      email,
-      password,
+      'wallet_password':password
     };
 
     fetch(apiUrl, {
@@ -87,7 +90,7 @@ const LoginPage = () => {
         if (data.access_token) {
           TokenManager.setToken(data.access_token, 120);
           setAccessToken(data.access_token);
-          navigate('/');
+          navigate(`/?session_id=${sessionId}`);
         } else {
           setError(data.error);
         }
@@ -104,19 +107,7 @@ const LoginPage = () => {
         <h1 style={headingStyle}>Login</h1>
         {error && <div style={{ color: 'red', marginBottom: '1rem' }}>{error}</div>}
         <div>
-          <label style={labelStyle} htmlFor="login-email">Email:</label>
-          <input
-            style={inputStyle}
-            id="login-email"
-            name="email"
-            type="email"
-            required
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-        </div>
-        <div>
-          <label style={labelStyle} htmlFor="login-password">Password:</label>
+          <label style={labelStyle} htmlFor="login-password">Wallet Password:</label>
           <input
             style={inputStyle}
             id="login-password"
@@ -141,11 +132,11 @@ const LoginPage = () => {
             Login
           </button>
         </div>
-        <div>
+        {/* <div>
           <a href="/signup" style={linkStyle}>
             Not registered yet? Sign up
           </a>
-        </div>
+        </div> */}
         <div>
           <a href="/password-reset" style={linkStyle}>
             Forgot Password?
