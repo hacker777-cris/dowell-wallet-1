@@ -72,7 +72,10 @@ const OTPVerificationPage = () => {
   const location = useLocation();
   const [otpKey, setOTPKey] = useState('');
   const { email, setEmail } = useUser(); // Use the email and setEmail from the context
+  const [newPassword, setNewPassword] = useState('');
   const [response, setResponse] = useState('');
+  const { setSessionId } = useUser();
+  const { sessionId } = useUser(); // Assuming sessionId is set using useEffect
   const [error, setError] = useState(null);
   const [isResendDisabled, setIsResendDisabled] = useState(false);
   const [remainingTime, setRemainingTime] = useState(60); // Initial remaining time in seconds
@@ -102,14 +105,15 @@ const OTPVerificationPage = () => {
   }, [isResendDisabled, remainingTime]);
 
   const handleVerifyOTP = () => {
-    // Construct the request body
-    const requestBody = {
-      otp_key: otpKey,
-      email, // Use the email received from the context
-    };
+    const urlSearchParams = new URLSearchParams(location.search);
+    const sessionId = urlSearchParams.get('session_id');
 
-    // Make a POST request to verify the OTP
-    fetch('https://100088.pythonanywhere.com/api/wallet/v1/verify-email', {
+    const requestBody = {
+      otp: otpKey,
+      wallet_password: newPassword, // Include the new password in the request body
+    };
+    const apiUrl =  `http://127.0.0.1:8000/api/wallet/v1/setup-new-pass?session_id=${sessionId}`
+    fetch(apiUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -119,15 +123,16 @@ const OTPVerificationPage = () => {
       .then(async (response) => {
         if (response.ok) {
           const responseData = await response.json();
-          setResponse(responseData.message); // Display the response message
-          setError(null); // Clear the error message
+          setResponse(responseData.message);
+          setError(null);
           setOTPKey('');
-          navigate('/login'); // Redirect to the login page
+          setNewPassword('');
+          navigate(`/login?session_id=${sessionId}`);
         } else {
           const errorData = await response.json();
           const errorMessage = errorData.message;
           setError(errorMessage);
-          setResponse(''); // Clear the success message
+          setResponse('');
         }
       })
       .catch((error) => {
@@ -138,29 +143,26 @@ const OTPVerificationPage = () => {
   };
 
   const handleResendOTP = () => {
+    const urlSearchParams = new URLSearchParams(location.search);
+    const sessionId = urlSearchParams.get('session_id');
     // Prevent multiple clicks while the link is disabled
     if (isResendDisabled) {
       return;
     }
 
-    // Construct the request body
-    const requestBody = {
-      email, // Use the email received from the context
-    };
-
     // Make a POST request to resend the OTP
-    fetch('https://100088.pythonanywhere.com/api/wallet/v1/resend-otp', {
+    fetch(`http://127.0.0.1:8000/api/wallet/v1/resend-otp?session_id=${sessionId}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(requestBody),
     })
       .then((response) => {
         if (response.ok) {
           setResponse('OTP resent successfully');
           setIsResendDisabled(true); // Disable the "Resend OTP" link
           setRemainingTime(60); // Reset the timer
+          console.log('Session ID after resend:', sessionId);
         } else {
           setError('Failed to resend OTP');
         }
@@ -188,6 +190,15 @@ const OTPVerificationPage = () => {
             onChange={(e) => setOTPKey(e.target.value)}
             style={inputStyle}
           />
+          <label htmlFor="newPassword">New Password</label>
+        <input
+          type="password"
+          id="newPassword"
+          name="newPassword"
+          value={newPassword}
+          onChange={(e) => setNewPassword(e.target.value)}
+          style={inputStyle}
+        />
           {response && <div style={responseStyle}>{response}</div>}
           {error && <div style={errorStyle}>{error}</div>}
           <button type="button" onClick={handleVerifyOTP} style={buttonStyle}>

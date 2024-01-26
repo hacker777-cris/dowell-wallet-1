@@ -1,150 +1,89 @@
-import React, { useState } from 'react';
-import { useNavigate,useLocation} from 'react-router-dom';
-import { useUser } from '../UserContext';
-import { TokenManager } from './Tokenmanager';
+import React, { useEffect } from 'react';
 
-const containerStyle = {
-  display: 'flex',
-  justifyContent: 'center',
-  alignItems: 'center',
-  height: '100vh',
-  backgroundColor: '#f7fafc',
-};
+function App() {
+  useEffect(() => {
+    const onGooglePayLoaded = () => {
+      // Replace 'your_merchant_id' with your actual Braintree merchant ID
+      const merchantId = 'BCR2DN4T6HPJPIRV';
 
-const formStyle = {
-  backgroundColor: '#fff',
-  boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-  borderRadius: '0.375rem',
-  padding: '1.5rem',
-  width: '360px',
-  textAlign: 'center',
-};
+      // Create a Google Pay client
+      const googlePayClient = new window.google.payments.api.PaymentsClient({
+        environment: 'TEST', // Use 'TEST' for testing, 'PRODUCTION' for production
+        merchantInfo: {
+          merchantId: merchantId,
+          merchantName: 'Your Merchant Name',
+        },
+        allowedPaymentMethods: ['CARD'],
+        cardRequirements: {
+          allowedCardNetworks: ['VISA', 'MASTERCARD'],
+        },
+      });
 
-const headingStyle = {
-  fontSize: '1.25rem',
-  fontWeight: 'bold',
-  marginBottom: '1rem',
-};
+      // Create Google Pay button and attach a click event listener
+      const googlePayButton = document.getElementById('google-pay-button');
+      googlePayButton.addEventListener('click', () => {
+        // Request payment data
+        googlePayClient.loadPaymentData({
+          allowedPaymentMethods: ['CARD'],
+          transactionInfo: {
+            totalPriceStatus: 'FINAL',
+            totalPrice: '1.00', // Total amount in the smallest currency unit (e.g., cents)
+            currencyCode: 'USD',
+          },
+        })
+        .then(paymentData => {
+          // Extract the payment method nonce from the payment data
+          const paymentMethodNonce = paymentData.paymentMethodData.tokenizationData.token;
 
-const labelStyle = {
-  display: 'block',
-  fontSize: '0.875rem',
-  color: '#4a5568',
-  fontWeight: 'bold',
-  marginBottom: '0.5rem',
-};
+          // Send the payment method nonce to the backend API
+          sendPaymentNonceToBackend(paymentMethodNonce);
+        })
+        .catch(error => {
+          console.error('Error loading payment data:', error);
+        });
+      });
 
-const inputStyle = {
-  border: '1px solid #e2e8f0',
-  borderRadius: '0.25rem',
-  width: '100%',
-  padding: '0.5rem',
-  marginBottom: '1rem',
-  fontSize: '0.875rem',
-};
-
-const buttonStyle = {
-  backgroundColor: '#4299e1',
-  color: '#ffffff',
-  borderRadius: '0.25rem',
-  padding: '0.5rem 1rem',
-  fontSize: '0.875rem',
-  cursor: 'pointer',
-};
-
-const linkStyle = {
-  color: '#4299e1',
-  textDecoration: 'none',
-  fontSize: '0.875rem',
-};
-
-const LoginPage = () => {  
-  const { setAccessToken } = useUser();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false); // State to toggle password visibility
-  const [error, setError] = useState('');
-  const location = useLocation(); // Use useLocation hook to access location
-  const navigate = useNavigate();
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const urlSearchParams = new URLSearchParams(location.search);
-    const sessionId = urlSearchParams.get('session_id');
-    console.log(sessionId)
-
-    const apiUrl = `http://127.0.0.1:8000/api/wallet/v1/wallet-login?session_id=${sessionId}`;
-    const requestBody = {
-      'wallet_password':password
+      // Function to send the payment nonce to the backend API
+      const sendPaymentNonceToBackend = (paymentMethodNonce) => {
+        // Make a POST request to your backend API endpoint
+        fetch('http://127.0.0.1:8000/api/googlepay/initialize', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            payment_method_nonce: paymentMethodNonce,
+            price: '1.00', // Same as the total price used in the payment data request
+          }),
+        })
+        .then(response => response.json())
+        .then(data => {
+          // Handle the response from the backend
+          console.log(data);
+          // You can perform additional actions based on the backend response
+        })
+        .catch(error => {
+          console.error('Error sending payment nonce to backend:', error);
+        });
+      };
     };
 
-    fetch(apiUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(requestBody),
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        if (data.access_token) {
-          TokenManager.setToken(data.access_token, 120);
-          setAccessToken(data.access_token);
-          navigate(`/?session_id=${sessionId}`);
-        } else {
-          setError(data.error);
-        }
-      })
-      .catch((error) => {
-        setError('An error occurred. Please try again.');
-        console.error('Error logging in:', error);
-      });
-  };
+    const script = document.createElement('script');
+    script.src = 'https://pay.google.com/gp/p/js/pay.js';
+    script.onload = onGooglePayLoaded;
+
+    document.head.appendChild(script);
+
+    return () => {
+      document.head.removeChild(script);
+    };
+  }, []);
 
   return (
-    <div style={containerStyle}>
-      <form style={formStyle} onSubmit={handleSubmit}>
-        <h1 style={headingStyle}>Login</h1>
-        {error && <div style={{ color: 'red', marginBottom: '1rem' }}>{error}</div>}
-        <div>
-          <label style={labelStyle} htmlFor="login-password">Wallet Password:</label>
-          <input
-            style={inputStyle}
-            id="login-password"
-            name="password"
-            type={showPassword ? 'text' : 'password'} // Toggle between 'text' and 'password'
-            required
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-          <label style={labelStyle} htmlFor="show-password">
-            Show Password
-          </label>
-          <input
-            type="checkbox"
-            id="show-password"
-            checked={showPassword}
-            onChange={() => setShowPassword(!showPassword)} // Toggle password visibility
-          />
-        </div>
-        <div>
-          <button style={buttonStyle} type="submit">
-            Login
-          </button>
-        </div>
-        {/* <div>
-          <a href="/signup" style={linkStyle}>
-            Not registered yet? Sign up
-          </a>
-        </div> */}
-        <div>
-          <a href="/password-reset" style={linkStyle}>
-            Forgot Password?
-          </a>
-        </div>
-      </form>
+    <div>
+      <button id="google-pay-button">Pay with Google Pay</button>
     </div>
   );
-};
+}
 
-export default LoginPage;
+export default App;
